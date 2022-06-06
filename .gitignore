@@ -1,0 +1,22 @@
+# ----- REACT -----
+# dependencies
+stu-client/node_modules
+stu-client/*.pnp
+stu-client/*.pnp.js
+
+# testing
+stu-client/coverage
+
+# production
+stu-client/build
+
+# misc
+stu-client/*.DS_Store
+stu-client/*.env.local
+stu-client/*.env.development.local
+stu-client/*.env.test.local
+stu-client/*.env.production.local
+
+stu-client/npm-debug.log*
+stu-client/yarn-debug.log*
+stu-client/yarn-error.log*
