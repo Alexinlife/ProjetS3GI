@@ -1,7 +1,7 @@
 import logo from '../logo.svg';
 import '../css/App.css';
 import NavBar from './NavBar';
-import Horaire from './Horaire';
+import Horaire from './Schedule';
 
 function App() {
   return (

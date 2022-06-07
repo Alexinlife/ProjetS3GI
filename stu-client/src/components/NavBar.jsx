@@ -15,7 +15,7 @@ import BellIcon from '@mui/icons-material/Notifications';
  */
 export default function NavBar() {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box className="nav-box" sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
           {/* Nom de l'application */}
