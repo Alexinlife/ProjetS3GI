@@ -1,12 +1,41 @@
 .nav-box {
+    position: fixed;
+    top: 0;
     width: 100%;
 }
 
-.nav-text {
-    margin: 0 0 0 0;
+.nav-tool {
+    background-color: #018849;
+}
+
+.nav-title {
+    margin: 0;
     text-align: left;
+}
+
+.nav-text {
+    padding-right: 10px;
+    text-align: right;
 }
 
 .nav-btn {
     margin: 0 5px 0 5px !important;
+}
+
+@media only screen and (max-width: 900px)  {
+    .nav-title-full {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 900px), (max-width: 600px) {
+    .nav-title-md {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 600px)  {
+    .nav-title-sm {
+        display: none;
+    }
 }
