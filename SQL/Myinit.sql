@@ -94,6 +94,14 @@ CREATE TABLE Tutorat_Utilisateur
     FOREIGN KEY (tutorat_id) REFERENCES Tutorat(id)
 );
 
+CREATE TABLE departement_utilisateurs
+(
+    cip VARCHAR(8) NOT NULL,
+    departement_id VARCHAR(4) NOT NULL,
+    PRIMARY KEY (cip, departement_id),
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip)
+);
+
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
 CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
 CREATE INDEX ind_numero_tutorat ON Tutorat(numero);
@@ -137,7 +145,7 @@ CREATE FUNCTION get_groupe_tutorat_jour(
     date DATE,
     app VARCHAR(8),
     session VARCHAR(3)
-)
+)e
     RETURNS TABLE (
                       cip VARCHAR,
                       nom VARCHAR,
