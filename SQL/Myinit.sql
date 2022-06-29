@@ -18,9 +18,16 @@ CREATE TABLE Role
 CREATE TABLE Echange
 (
     timestamp TIMESTAMPTZ NOT NULL,
-    message VARCHAR(255) NOT NULL,
     id SERIAL,
-    PRIMARY KEY (id)
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur int,
+    tutorat_cibe int,
+    confirme int,
+    -- 1 confirme  , 0 en attente, -1 annule
+    PRIMARY KEY (id),
+    FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
+    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id)
 );
 
 CREATE TABLE Log
@@ -108,7 +115,7 @@ CREATE INDEX ind_numero_tutorat ON Tutorat(numero);
 CREATE INDEX ind_numero_app ON APP(numero);
 
 
-CREATE FUNCTION get_groupe_tutorat_heure(
+CREATE FUNCTION getGroupeTutoratHeure(
     date DATE,
     debut TIMESTAMPTZ,
     app VARCHAR(8),
@@ -133,42 +140,90 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on A.session_code = S.code
         INNER JOIN Plage P on T.plage_id = P.id
-        WHERE get_groupe_tutorat_heure.date = T.date
-        AND get_groupe_tutorat_heure.debut = p.debut
-        AND get_groupe_tutorat_heure.app = A.numero
-        AND get_groupe_tutorat_heure.session = S.code;
+        WHERE getGroupeTutoratHeure.date = T.date
+        AND getGroupeTutoratHeure.debut = p.debut
+        AND getGroupeTutoratHeure.app = A.numero
+        AND getGroupeTutoratHeure.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION get_groupe_tutorat_jour(
-    date DATE,
-    app VARCHAR(8),
-    session VARCHAR(3)
-)e
+CREATE FUNCTION getHoraireUtilisateur(
+    cip VARCHAR
+)
     RETURNS TABLE (
-                      cip VARCHAR,
-                      nom VARCHAR,
-                      prenom VARCHAR,
-                      debut TIMESTAMPTZ
+                    id INT,
+                    date TIMESTAMP,
+                    numeroTutorat INT,
+                    debut TIMESTAMPTZ,
+                    numeroAPP VARCHAR(8),
+                    session VARCHAR(3)
                   )
 AS
 $$
 BEGIN
     RETURN QUERY SELECT
-                     U.cip,
-                     U.nom,
-                     U.prenom,
-                     P.debut
-                 FROM Utilisateur U, Plage P
-                          INNER JOIN tutorat_utilisateur tu on U.cip = tu.cip
+        T.id,
+        T.date,
+        T.numero,
+        P.debut,
+        A.numero,
+        S.code
+                FROM Utilisateur U
+                INNER JOIN Tutorat_Utilisateur TU on U.cip = TU.cip
+                INNER JOIN Tutorat T on T.id = TU.tutorat_id
+                INNER JOIN Plage P on P.id = T.plage_id
+                INNER JOIN APP A on A.id = T.APP_id
+                INNER JOIN Session S on S.code = A.session_code
+                WHERE getHoraireUtilisateur().cip =U.cip;
+END;
+$$
+    LANGUAGE 'plpgsql';
+
+CREATE FUNCTION validationCIP (
+    cip VARCHAR(8)
+)
+    RETURNS TABLE
+    (
+        valid BOOLEAN
+    )
+AS
+$$
+BEGIN
+    RETRUN QUERY
+END;
+$$
+    LANGUAGE  'plpgsql';
+
+CREATE FUNCTION getGroupeTutoratHeure(
+    date DATE,
+    debut TIMESTAMPTZ,
+    app VARCHAR(8),
+    session VARCHAR(3)
+)
+    RETURNS TABLE (
+                      cip VARCHAR,
+                      nom VARCHAR,
+                      prenom VARCHAR
+                  )
+AS
+$$
+BEGIN
+    RETURN QUERY SELECT
+                     Utilisateur.cip,
+                     Utilisateur.nom,
+                     utilisateur.prenom
+
+                 FROM Utilisateur
+                          INNER JOIN tutorat_utilisateur tu on Utilisateur.cip = tu.cip
                           INNER JOIN Tutorat T on tu.tutorat_id = T.id
                           INNER JOIN APP A on A.id = T.APP_id
                           INNER JOIN Session S on A.session_code = S.code
-                 WHERE get_groupe_tutorat_jour.date = T.date
-                   AND get_groupe_tutorat_jour.app = A.numero
-                   AND get_groupe_tutorat_jour.session = S.code
-                   AND T.plage_id = P.id;
+                          INNER JOIN Plage P on T.plage_id = P.id
+                 WHERE getGroupeTutoratHeure.date = T.date
+                   AND getGroupeTutoratHeure.debut = p.debut
+                   AND getGroupeTutoratHeure.app = A.numero
+                   AND getGroupeTutoratHeure.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
