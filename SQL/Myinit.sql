@@ -15,21 +15,6 @@ CREATE TABLE Role
     PRIMARY KEY (id)
 );
 
-CREATE TABLE Echange
-(
-    timestamp TIMESTAMPTZ NOT NULL,
-    id SERIAL,
-    demandeur VARCHAR(8),
-    cible VARCHAR(8),
-    tutorat_demandeur int,
-    tutorat_cibe int,
-    confirme int,
-    -- 1 confirme  , 0 en attente, -1 annule
-    PRIMARY KEY (id),
-    FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
-    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id)
-);
-
 CREATE TABLE Log
 (
     timestamp TIMESTAMPTZ NOT NULL,
@@ -107,6 +92,21 @@ CREATE TABLE departement_utilisateurs
     departement_id VARCHAR(4) NOT NULL,
     PRIMARY KEY (cip, departement_id),
     FOREIGN KEY (cip) REFERENCES Utilisateur(cip)
+);
+
+CREATE TABLE Echange
+(
+    timestamp TIMESTAMPTZ NOT NULL,
+    id SERIAL,
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur int,
+    tutorat_cibe int,
+    confirme int,
+    -- 1 confirme  , 0 en attente, -1 annule
+    PRIMARY KEY (id),
+    FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
+    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id)
 );
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
@@ -190,7 +190,7 @@ CREATE FUNCTION validationCIP (
 AS
 $$
 BEGIN
-    RETRUN QUERY
+    RETURN QUERY
 END;
 $$
     LANGUAGE  'plpgsql';
