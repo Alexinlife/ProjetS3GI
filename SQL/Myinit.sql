@@ -152,12 +152,12 @@ CREATE FUNCTION getHoraireUtilisateur(
     cip VARCHAR
 )
     RETURNS TABLE (
-                    id INT,
-                    date TIMESTAMP,
+                    idTutorat INT,
+                    dateTutorat TIMESTAMP,
                     numeroTutorat INT,
-                    debut TIMESTAMPTZ,
+                    debutTutorat TIMESTAMPTZ,
                     numeroAPP VARCHAR(8),
-                    session VARCHAR(3)
+                    sessionApp VARCHAR(3)
                   )
 AS
 $$
