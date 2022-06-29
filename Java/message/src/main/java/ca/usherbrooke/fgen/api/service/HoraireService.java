@@ -1,7 +1,6 @@
 package ca.usherbrooke.fgen.api.service;
 
 import ca.usherbrooke.fgen.api.business.Horaire;
-import ca.usherbrooke.fgen.api.business.Notification;
 import ca.usherbrooke.fgen.api.persistence.horaireMapper;
 
 import javax.inject.Inject;
