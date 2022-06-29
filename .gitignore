@@ -20,3 +20,8 @@ stu-client/*.env.production.local
 stu-client/npm-debug.log*
 stu-client/yarn-debug.log*
 stu-client/yarn-error.log*
+
+# ----- API -----
+java/.idea
+java/message/.gradle
+java/message/build
