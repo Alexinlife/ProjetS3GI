@@ -1,19 +1,17 @@
 package ca.usherbrooke.fgen.api.persistence;
 
-import ca.usherbrooke.fgen.api.business.EchangeDirecte;
 import ca.usherbrooke.fgen.api.business.Horaire;
-import ca.usherbrooke.fgen.api.business.Message;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+@Mapper
 public interface horaireMapper {
-    List<Horaire> selectHoraire(String HeureDebut, String HeureFin, String Date, String Local,
-                         String Description, String nomCours);
+    List<Horaire> selectHoraire();
 
-    boolean validerEchangeRapide(String cip1, String cip2, String cours, String tutorat);
+    //boolean validerEchangeRapide(String cip1, String cip2, String cours, String tutorat);
 
-    String getNotification();
+    //String getNotification();
 
     //EchangeDirecte trade(String CIPdonneur, String CIPreceveur);
 }

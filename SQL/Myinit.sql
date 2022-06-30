@@ -175,7 +175,7 @@ BEGIN
                 INNER JOIN Plage P on P.id = T.plage_id
                 INNER JOIN APP A on A.id = T.APP_id
                 INNER JOIN Session S on S.code = A.session_code
-                WHERE getHoraireUtilisateur().cip =U.cip;
+                WHERE $1=U.cip;
 END;
 $$
     LANGUAGE 'plpgsql';

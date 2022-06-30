@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/../../../APP 2/Problématique/JSP/init.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/Myinit.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/TransferDonnéesProf.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/TransferDonnéesProf.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/initProf.sql" dialect="PostgreSQL" />
   </component>
 </project>
