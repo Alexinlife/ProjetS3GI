@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import '../css/UdS.css';
 import Box from '@mui/material/Box';
 import { Button, Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material';
@@ -10,7 +11,10 @@ class Availabilities extends React.Component {
 
     render() {
         return (
-            <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+            <Box className="UdS-option" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+                <Link className="UdS-link" to={`/home`}>
+                    <Button>Retour</Button>
+                </Link>
                 <Typography className="UdS-title" variant="h6">Changez vos disponibilités :</Typography>
                 <FormGroup>
                     <FormControlLabel control={<Checkbox sx={{

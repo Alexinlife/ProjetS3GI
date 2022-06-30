@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import '../css/UdS.css';
 import '../css/QuickSwitch.css';
 import Box from '@mui/material/Box';
@@ -7,7 +8,10 @@ import { Button, Divider, FormGroup, TextField, Typography } from '@mui/material
 class QuickSwitch extends React.Component {
     render() {
         return (
-            <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+            <Box className="UdS-option" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+                <Link className="UdS-link" to={`/home`}>
+                    <Button>Retour</Button>
+                </Link>
                 <Typography className="UdS-title" variant="h6">Entrez le CIP pour l'échange rapide :</Typography>
                 <FormGroup>
                     <TextField className="QS-field" id="cip" label="CIP" variant="outlined" sx={{
