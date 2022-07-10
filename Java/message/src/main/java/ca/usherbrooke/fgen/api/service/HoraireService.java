@@ -35,22 +35,6 @@ public class HoraireService {
         System.out.print(horaires);
         return (horaires);
     }
-
-
-
-
-
-    public static Horaire unescapeEntities(Horaire horaire) {
-        horaire.description = Parser.unescapeEntities(horaire.description, true);
-        return horaire;
-    }
-
-    public List<Horaire> unescapeEntities(List<Horaire> horaire) {
-        return horaire
-                .stream()
-                .map(HoraireService::unescapeEntities)
-                .collect(Collectors.toList());
-    }
 }
 
 
