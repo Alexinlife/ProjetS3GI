@@ -1,4 +1,3 @@
-CREATE SCHEMA tg;
 CREATE TABLE Utilisateur
 (
     cip CHAR(8) NOT NULL,
@@ -203,9 +202,9 @@ END;
 $$
     LANGUAGE  'plpgsql';
 
-CREATE FUNCTION validationCIPCour (
+CREATE FUNCTION validationCIPTutorat(
     cip VARCHAR(8),
-    cour INT
+    tutoratID INT
 )
     RETURNS BOOLEAN
 AS
@@ -215,8 +214,8 @@ BEGIN
         CASE WHEN EXISTS
             (
                 SELECT * FROM tutorat_utilisateur tu
-                        WHERE tu.cip = validationCIPCour.cip
-                        AND tu.tutorat_id = validationCIPCour.cour
+                        WHERE tu.cip = validationCIPTutorat.cip
+                        AND tu.tutorat_id = validationCIPTutorat.tutoratID
             )
                  THEN 'TRUE'
              ELSE 'FALSE'
@@ -311,11 +310,19 @@ CREATE FUNCTION validationForEchangeRapide
     cip2 VARCHAR(8),
     app VARCHAR(8),
     session VARCHAR(3),
-    idTutorat INT
+    idTutorat1 INT,
+    idTutorat2 INT
 )
     RETURNS BOOLEAN
 AS
     $$BEGIN
+    RETURN validationCIP(validationForEchangeRapide.cip1)
+        AND validationCIP(validationForEchangeRapide.cip2)
+        AND validationCour(validationForEchangeRapide.app, validationForEchangeRapide.session)
+        AND validationTutorat(validationForEchangeRapide.idTutorat1)
+        AND validationTutorat(validationForEchangeRapide.idTutorat2)
+        AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
+        AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2);
 
 end;$$ LANGUAGE 'plpgsql';
 
