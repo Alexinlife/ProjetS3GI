@@ -1,27 +1,20 @@
 package ca.usherbrooke.fgen.api.service;
 
-import ca.usherbrooke.fgen.api.business.Message;
-import ca.usherbrooke.fgen.api.persistence.MessageMapper;
-import ca.usherbrooke.fgen.api.persistence.ValidationMapper;
-import org.jsoup.parser.Parser;
+import ca.usherbrooke.fgen.api.persistence.EchangeMapper;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
 
 
 @Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 
-public class ValidationService {
+public class EchangeService {
 
     @Inject
-    ValidationMapper validationMapper;
+    EchangeMapper echangeMapper;
 
     @GET
     @Path("getValidation/{cip1}/{cip2}/{cours}/{tutorat}")
@@ -42,7 +35,7 @@ public class ValidationService {
             if (tmp_cip2 == cip2) {
                 if (tmp_cours == cours) {
                     if (tmp_tutorat1 == tutorat) {
-                        boolean answer = validationMapper.getValidation();
+                        boolean answer = echangeMapper.getValidation();
                         return answer;
                     }
                 }
