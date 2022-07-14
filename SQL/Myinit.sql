@@ -1,5 +1,5 @@
 CREATE SCHEMA tg;
-CREATE TABLE tg.Utilisateur
+CREATE TABLE Utilisateur
 (
     cip CHAR(8) NOT NULL,
     nom VARCHAR(255) NOT NULL,
@@ -9,14 +9,14 @@ CREATE TABLE tg.Utilisateur
     UNIQUE (courriel)
 );
 
-CREATE TABLE tg.Role
+CREATE TABLE Role
 (
     Nom VARCHAR(255) NOT NULL,
     id SERIAL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE tg.Log
+CREATE TABLE Log
 (
     timestamp TIMESTAMPTZ NOT NULL,
     message VARCHAR(255) NOT NULL,
@@ -24,13 +24,13 @@ CREATE TABLE tg.Log
     PRIMARY KEY (id)
 );
 
-CREATE TABLE tg.Session
+CREATE TABLE Session
 (
     code VARCHAR(3) NOT NULL,
     PRIMARY KEY (code)
 );
 
-CREATE TABLE tg.Plage
+CREATE TABLE Plage
 (
     debut TIMESTAMPTZ NOT NULL,
     fin TImESTAMPTZ NOT NULL,
@@ -38,35 +38,35 @@ CREATE TABLE tg.Plage
     PRIMARY KEY (id)
 );
 
-CREATE TABLE tg.Role_utilisateur
+CREATE TABLE Role_utilisateur
 (
     role_id INT NOT NULL,
     cip CHAR(8) NOT NULL,
     PRIMARY KEY (role_id, cip),
-    FOREIGN KEY (role_id) REFERENCES tg.Role(id),
-    FOREIGN KEY (cip) REFERENCES tg.Utilisateur(cip)
+    FOREIGN KEY (role_id) REFERENCES Role(id),
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip)
 );
 
-CREATE TABLE tg.Disponibilité_Utilisateur
+CREATE TABLE Disponibilité_Utilisateur
 (
     cip CHAR(8) NOT NULL,
     id_plage INT NOT NULL,
     PRIMARY KEY (cip, id_plage),
-    FOREIGN KEY (cip) REFERENCES tg.Utilisateur(cip),
-    FOREIGN KEY (id_plage) REFERENCES tg.Plage(id)
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
+    FOREIGN KEY (id_plage) REFERENCES Plage(id)
 );
 
-CREATE TABLE tg.APP
+CREATE TABLE APP
 (
     id SERIAL,
     numero VARCHAR(20) NOT NULL,
     nom VARCHAR(255) NOT NULL,
     session_code VARCHAR(3) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (session_code) REFERENCES tg.Session(code)
+    FOREIGN KEY (session_code) REFERENCES Session(code)
 );
 
-CREATE TABLE tg.Tutorat
+CREATE TABLE Tutorat
 (
     date TIMESTAMP NOT NULL,
     id SERIAL,
@@ -74,28 +74,28 @@ CREATE TABLE tg.Tutorat
     APP_id INT NOT NULL,
     plage_id INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (APP_id) REFERENCES tg.APP(id),
-    FOREIGN KEY (plage_id) REFERENCES tg.Plage(id)
+    FOREIGN KEY (APP_id) REFERENCES APP(id),
+    FOREIGN KEY (plage_id) REFERENCES Plage(id)
 );
 
-CREATE TABLE tg.Tutorat_Utilisateur
+CREATE TABLE Tutorat_Utilisateur
 (
     cip CHAR(8) NOT NULL,
     tutorat_id INT NOT NULL,
     PRIMARY KEY (cip, tutorat_id),
-    FOREIGN KEY (cip) REFERENCES tg.Utilisateur(cip),
-    FOREIGN KEY (tutorat_id) REFERENCES tg.Tutorat(id)
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
+    FOREIGN KEY (tutorat_id) REFERENCES Tutorat(id)
 );
 
-CREATE TABLE tg.departement_utilisateurs
+CREATE TABLE departement_utilisateurs
 (
     cip VARCHAR(8) NOT NULL,
     departement_id VARCHAR(4) NOT NULL,
     PRIMARY KEY (cip, departement_id),
-    FOREIGN KEY (cip) REFERENCES tg.Utilisateur(cip)
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip)
 );
 
-CREATE TABLE tg.Echange
+CREATE TABLE Echange
 (
     timestamp TIMESTAMPTZ NOT NULL,
     id SERIAL,
@@ -106,20 +106,20 @@ CREATE TABLE tg.Echange
     confirme int,
     -- 1 confirme  , 0 en attente, -1 annule
     PRIMARY KEY (id),
-    FOREIGN KEY (tutorat_demandeur) REFERENCES tg.Tutorat(id),
-    FOREIGN KEY (tutorat_cibe) REFERENCES tg.Tutorat(id),
-    FOREIGN KEY (demandeur) REFERENCES tg.Utilisateur(cip),
-    FOREIGN KEY (cible) REFERENCES tg.Utilisateur(cip)
+    FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
+    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id),
+    FOREIGN KEY (demandeur) REFERENCES Utilisateur(cip),
+    FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
 );
 
 
-CREATE INDEX ind_courriel_utilisateur ON tg.Utilisateur(courriel);
-CREATE INDEX ind_nom_prenom_utilisateur ON tg.Utilisateur(nom,prenom);
-CREATE INDEX ind_numero_tutorat ON tg.Tutorat(numero);
-CREATE INDEX ind_numero_app ON tg.APP(numero);
+CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
+CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
+CREATE INDEX ind_numero_tutorat ON Tutorat(numero);
+CREATE INDEX ind_numero_app ON APP(numero);
 
 
-CREATE FUNCTION tg.getGroupeTutoratHeure(
+CREATE FUNCTION getGroupeTutoratHeure(
     date DATE,
     debut TIMESTAMPTZ,
     app VARCHAR(8),
@@ -139,20 +139,20 @@ BEGIN
                      utilisateur.prenom
 
     FROM Utilisateur
-        INNER JOIN tg.tutorat_utilisateur tu on tg.Utilisateur.cip = tu.cip
-        INNER JOIN tg.Tutorat T on tu.tutorat_id = T.id
-        INNER JOIN tg.APP A on A.id = T.APP_id
-        INNER JOIN tg.Session S on A.session_code = S.code
-        INNER JOIN tg.Plage P on T.plage_id = P.id
-        WHERE tg.getGroupeTutoratHeure.date = T.date
-        AND tg.getGroupeTutoratHeure.debut = p.debut
-        AND tg.getGroupeTutoratHeure.app = A.numero
-        AND tg.getGroupeTutoratHeure.session = S.code;
+        INNER JOIN tutorat_utilisateur tu on Utilisateur.cip = tu.cip
+        INNER JOIN Tutorat T on tu.tutorat_id = T.id
+        INNER JOIN APP A on A.id = T.APP_id
+        INNER JOIN Session S on A.session_code = S.code
+        INNER JOIN Plage P on T.plage_id = P.id
+        WHERE getGroupeTutoratHeure.date = T.date
+        AND getGroupeTutoratHeure.debut = p.debut
+        AND getGroupeTutoratHeure.app = A.numero
+        AND getGroupeTutoratHeure.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION tg.getHoraireUtilisateur(
+CREATE FUNCTION getHoraireUtilisateur(
     cip VARCHAR(8)
 )
     RETURNS TABLE (
@@ -173,31 +173,28 @@ BEGIN
         P.debut,
         A.numero,
         S.code
-                FROM tg.Utilisateur U
-                INNER JOIN tg.Tutorat_Utilisateur TU on U.cip = TU.cip
-                INNER JOIN tg.Tutorat T on T.id = TU.tutorat_id
-                INNER JOIN tg.Plage P on P.id = T.plage_id
-                INNER JOIN tg.APP A on A.id = T.APP_id
-                INNER JOIN tg.Session S on S.code = A.session_code
-                WHERE tg.getHoraireUtilisateur.cip =U.cip;
+                FROM Utilisateur U
+                INNER JOIN Tutorat_Utilisateur TU on U.cip = TU.cip
+                INNER JOIN Tutorat T on T.id = TU.tutorat_id
+                INNER JOIN Plage P on P.id = T.plage_id
+                INNER JOIN APP A on A.id = T.APP_id
+                INNER JOIN Session S on S.code = A.session_code
+                WHERE getHoraireUtilisateur.cip =U.cip;
 END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION tg.validationCIP (
+CREATE FUNCTION validationCIP (
     cip VARCHAR(8)
 )
-    RETURNS TABLE
-    (
-        valid BOOLEAN
-    )
+    RETURNS BOOLEAN
 AS
 $$
 BEGIN
     SELECT
         CASE WHEN EXISTS
             (
-                SELECT * FROM tg.Utilisateur U WHERE U.cip = tg.validationCIP.cip
+                SELECT * FROM Utilisateur U WHERE U.cip = validationCIP.cip
             )
             THEN 'TRUE'
             ELSE 'FALSE'
@@ -206,23 +203,20 @@ END;
 $$
     LANGUAGE  'plpgsql';
 
-CREATE FUNCTION tg.validationCIPCour (
+CREATE FUNCTION validationCIPCour (
     cip VARCHAR(8),
     cour INT
 )
-    RETURNS TABLE
-            (
-                valid BOOLEAN
-            )
+    RETURNS BOOLEAN
 AS
 $$
 BEGIN
     SELECT
         CASE WHEN EXISTS
             (
-                SELECT * FROM tg.tutorat_utilisateur tu
-                        WHERE tu.cip = tg.validationCIPCour.cip
-                        AND tu.tutorat_id = tg.validationCIPCour.cour
+                SELECT * FROM tutorat_utilisateur tu
+                        WHERE tu.cip = validationCIPCour.cip
+                        AND tu.tutorat_id = validationCIPCour.cour
             )
                  THEN 'TRUE'
              ELSE 'FALSE'
@@ -231,21 +225,18 @@ END;
 $$
     LANGUAGE  'plpgsql';
 
-CREATE FUNCTION tg.validationSession (
+CREATE FUNCTION validationSession (
     session VARCHAR(3)
 )
-    RETURNS TABLE
-            (
-                valid BOOLEAN
-            )
+    RETURNS BOOLEAN
 AS
 $$
 BEGIN
     SELECT
         CASE WHEN EXISTS
             (
-                SELECT * FROM tg.Session S
-                WHERE s.code = tg.validationSession.session
+                SELECT * FROM Session S
+                WHERE s.code = validationSession.session
             )
                  THEN 'TRUE'
              ELSE 'FALSE'
@@ -254,7 +245,7 @@ END;
 $$
     LANGUAGE  'plpgsql';
 
-CREATE FUNCTION tg.returnHeureID
+CREATE FUNCTION returnHeureID
     (
         id INT
     )
@@ -266,38 +257,69 @@ AS
 $$BEGIN
     RETURN QUERY SELECT
                     P.debut
-                    FROM tg.plage P
-                    WHERE P.id = tg.returnHeureID.id;
+                    FROM plage P
+                    WHERE P.id = returnHeureID.id;
 END;$$
     LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION tg.validationCour (
+CREATE FUNCTION validationCour (
     app VARCHAR(8),
     session VARCHAR(3)
 )
-    RETURNS TABLE
-            (
-                valid BOOLEAN
-            )
+    RETURNS BOOLEAN
 AS
 $$
 BEGIN
     SELECT
         CASE WHEN EXISTS
             (
-                SELECT * FROM tg.app A
-                WHERE A.numero = tg.validationCour.app
-                AND A.session_code = tg.validationCour.session
+                SELECT * FROM app A
+                WHERE A.numero = validationCour.app
+                AND A.session_code = validationCour.session
             )
                  THEN 'TRUE'
              ELSE 'FALSE'
             END;
 END;
 $$
-    LANGUAGE  'plpgsql';
+    LANGUAGE 'plpgsql';
 
-CREATE FUNCTION tg.getGroupeTutoratJour(
+CREATE FUNCTION validationTutorat (
+    idTutorat INT
+)
+    RETURNS BOOLEAN
+AS
+$$
+BEGIN
+    SELECT
+        CASE WHEN EXISTS
+            (
+                SELECT * FROM tutorat T
+                WHERE T.id = validationTutorat.idTutorat
+            )
+                 THEN 'TRUE'
+             ELSE 'FALSE'
+            END;
+END;
+$$
+    LANGUAGE 'plpgsql';
+
+CREATE FUNCTION validationForEchangeRapide
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    app VARCHAR(8),
+    session VARCHAR(3),
+    idTutorat INT
+)
+    RETURNS BOOLEAN
+AS
+    $$BEGIN
+
+end;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION getGroupeTutoratJour(
     date DATE,
     app VARCHAR(8),
     session VARCHAR(3)
@@ -316,20 +338,20 @@ BEGIN
                      U.nom,
                      U.prenom,
                      P.debut
-                 FROM tg.Utilisateur U
-                          INNER JOIN tg.tutorat_utilisateur tu on U.cip = tu.cip
-                          INNER JOIN tg.Tutorat T on tu.tutorat_id = T.id
-                          INNER JOIN tg.APP A on A.id = T.APP_id
-                          INNER JOIN tg.Session S on A.session_code = S.code
-                          INNER JOIN tg.Plage P on T.plage_id = P.id
-                 WHERE tg.getGroupeTutoratHeure.date = T.date
-                   AND tg.getGroupeTutoratHeure.app = A.numero
-                   AND tg.getGroupeTutoratHeure.session = S.code;
+                 FROM Utilisateur U
+                          INNER JOIN tutorat_utilisateur tu on U.cip = tu.cip
+                          INNER JOIN Tutorat T on tu.tutorat_id = T.id
+                          INNER JOIN APP A on A.id = T.APP_id
+                          INNER JOIN Session S on A.session_code = S.code
+                          INNER JOIN Plage P on T.plage_id = P.id
+                 WHERE getGroupeTutoratHeure.date = T.date
+                   AND getGroupeTutoratHeure.app = A.numero
+                   AND getGroupeTutoratHeure.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION tg.getNotif
+CREATE FUNCTION getNotif
     (
         cip VARCHAR(8)
     )
@@ -353,13 +375,13 @@ AS
                          E.tutorat_demandeur,
                          E.tutorat_cibe,
                          E.confirme
-                         FROM tg.echange E
-                        WHERE tg.getNotif.cip =E.cible;
+                         FROM echange E
+                        WHERE getNotif.cip =E.cible;
     END;$$
-    LANGUAGE 'plpgsql'
+    LANGUAGE 'plpgsql';
 
 
---CREATE FUNCTION get_dipso_tutorat_plage(
+--CREATE FUNCTION getDipsoTutorat(
 --    date DATE,
 --    debut TIMESTAMPTZ,
 --    app VARCHAR(8),
