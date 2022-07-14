@@ -254,7 +254,7 @@ END;
 $$
     LANGUAGE  'plpgsql';
 
-CREATE FUNCTION returnHeureID
+CREATE FUNCTION tg.returnHeureID
     (
         id INT
     )
@@ -335,7 +335,7 @@ CREATE FUNCTION tg.getNotif
     )
     RETURNS TABLE
     (
-        time TIMESTAMPTZ,
+        temps TIMESTAMPTZ,
         id INT,
         demandeur VARCHAR(8),
         cible VARCHAR(8),
