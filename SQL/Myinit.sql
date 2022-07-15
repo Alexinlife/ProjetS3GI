@@ -313,17 +313,22 @@ CREATE FUNCTION validationForEchangeRapide
     idTutorat1 INT,
     idTutorat2 INT
 )
-    RETURNS BOOLEAN
+    RETURNS TABLE
+    (
+        valid BOOLEAN
+    )
 AS
     $$BEGIN
-    RETURN validationCIP(validationForEchangeRapide.cip1)
+    SELECT
+    CASE WHEN validationCIP(validationForEchangeRapide.cip1)
         AND validationCIP(validationForEchangeRapide.cip2)
         AND validationCour(validationForEchangeRapide.app, validationForEchangeRapide.session)
         AND validationTutorat(validationForEchangeRapide.idTutorat1)
         AND validationTutorat(validationForEchangeRapide.idTutorat2)
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
-        AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2);
-
+        AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
+        THEN 'TRUE'
+        ELSE 'FALSE' END;
 end;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION getGroupeTutoratJour(
@@ -351,9 +356,9 @@ BEGIN
                           INNER JOIN APP A on A.id = T.APP_id
                           INNER JOIN Session S on A.session_code = S.code
                           INNER JOIN Plage P on T.plage_id = P.id
-                 WHERE getGroupeTutoratHeure.date = T.date
-                   AND getGroupeTutoratHeure.app = A.numero
-                   AND getGroupeTutoratHeure.session = S.code;
+                 WHERE getGroupeTutoratJour.date = T.date
+                   AND getGroupeTutoratJour.app = A.numero
+                   AND getGroupeTutoratJour.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
@@ -388,19 +393,19 @@ AS
     LANGUAGE 'plpgsql';
 
 
---CREATE FUNCTION getDipsoTutorat(
---    date DATE,
---    debut TIMESTAMPTZ,
---    app VARCHAR(8),
---    session VARCHAR(3)
---)
---AS
---$$
---BEGIN
---
---END;
---$$
---    LANGUAGE 'plpgsql';
+CREATE FUNCTION getDipsoTutorat(
+    date DATE,
+    debut TIMESTAMPTZ,
+    app VARCHAR(8),
+    session VARCHAR(3)
+)
+AS
+$$
+BEGIN
+
+END;
+$$
+    LANGUAGE 'plpgsql';
 
 
 --CREATE schema sch;
