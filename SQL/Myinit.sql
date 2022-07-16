@@ -190,16 +190,14 @@ CREATE FUNCTION validationCIP (
 AS
 $$
 BEGIN
-    SELECT
         CASE WHEN EXISTS
             (
-                SELECT * FROM Utilisateur U WHERE U.cip = validationCIP.cip
+                SELECT * FROM Utilisateur U WHERE U.cip = 'doyf1501'
             )
-            THEN 'TRUE'
-            ELSE 'FALSE'
-        END;
-END;
-$$
+            THEN RETURN TRUE;
+            ELSE RETURN FALSE;
+        END CASE;
+END$$
     LANGUAGE  'plpgsql';
 
 CREATE FUNCTION validationCIPTutorat(
@@ -210,17 +208,17 @@ CREATE FUNCTION validationCIPTutorat(
 AS
 $$
 BEGIN
-    SELECT
+
         CASE WHEN EXISTS
             (
                 SELECT * FROM tutorat_utilisateur tu
                         WHERE tu.cip = validationCIPTutorat.cip
                         AND tu.tutorat_id = validationCIPTutorat.tutoratID
             )
-                 THEN 'TRUE'
-             ELSE 'FALSE'
-            END;
-END;
+            THEN RETURN TRUE;
+            ELSE RETURN FALSE;
+            END CASE;
+END
 $$
     LANGUAGE  'plpgsql';
 
@@ -231,16 +229,15 @@ CREATE FUNCTION validationSession (
 AS
 $$
 BEGIN
-    SELECT
         CASE WHEN EXISTS
             (
                 SELECT * FROM Session S
                 WHERE s.code = validationSession.session
             )
-                 THEN 'TRUE'
-             ELSE 'FALSE'
-            END;
-END;
+            THEN RETURN TRUE;
+            ELSE RETURN FALSE;
+            END CASE;
+END
 $$
     LANGUAGE  'plpgsql';
 
@@ -270,17 +267,16 @@ CREATE FUNCTION validationCour (
 AS
 $$
 BEGIN
-    SELECT
         CASE WHEN EXISTS
             (
                 SELECT * FROM app A
                 WHERE A.numero = validationCour.app
                 AND A.session_code = validationCour.session
             )
-                 THEN 'TRUE'
-             ELSE 'FALSE'
-            END;
-END;
+            THEN RETURN TRUE;
+            ELSE RETURN FALSE;
+            END CASE;
+END
 $$
     LANGUAGE 'plpgsql';
 
@@ -291,16 +287,15 @@ CREATE FUNCTION validationTutorat (
 AS
 $$
 BEGIN
-    SELECT
         CASE WHEN EXISTS
             (
                 SELECT * FROM tutorat T
                 WHERE T.id = validationTutorat.idTutorat
             )
-                 THEN 'TRUE'
-             ELSE 'FALSE'
-            END;
-END;
+            THEN RETURN TRUE;
+            ELSE RETURN FALSE;
+            END CASE;
+END
 $$
     LANGUAGE 'plpgsql';
 
@@ -319,7 +314,7 @@ CREATE FUNCTION validationForEchangeRapide
     )
 AS
     $$BEGIN
-    SELECT
+        RETURN QUERY SELECT
     CASE WHEN validationCIP(validationForEchangeRapide.cip1)
         AND validationCIP(validationForEchangeRapide.cip2)
         AND validationCour(validationForEchangeRapide.app, validationForEchangeRapide.session)
@@ -327,8 +322,10 @@ AS
         AND validationTutorat(validationForEchangeRapide.idTutorat2)
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
-        THEN 'TRUE'
-        ELSE 'FALSE' END;
+        AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
+        THEN TRUE
+        ELSE FALSE
+        END;
 end;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION getGroupeTutoratJour(
@@ -399,6 +396,11 @@ CREATE FUNCTION getDipsoTutorat(
     app VARCHAR(8),
     session VARCHAR(3)
 )
+RETURNS TABLE
+(
+    idTutorat INT,
+    cip VARCHAR(8)
+)
 AS
 $$
 BEGIN
@@ -407,8 +409,3 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-
---CREATE schema sch;
---CREATE TABLE sch.dept_tri (department_id VARCHAR(4), trimester_id VARCHAR(3), PRIMARY KEY (department_id, trimester_id));
---INSERT INTO sch.dept_tri
---    SELECT DISTINCT department_id, trimester_id FROM extern_presence.group_appointments;
