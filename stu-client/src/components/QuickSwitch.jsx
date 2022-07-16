@@ -14,7 +14,7 @@ class QuickSwitch extends React.Component {
                 </Link>
                 <Typography className="UdS-title" variant="h6">Entrez le CIP pour l'échange rapide :</Typography>
                 <FormGroup>
-                    <TextField className="QS-field" id="cip" label="CIP" variant="outlined" sx={{
+                    <TextField autoFocus className="QS-field" id="cip" label="CIP" required variant="outlined" sx={{
                         '& ': {
                             marginTop: '30px',
                         },

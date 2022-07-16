@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import '../css/UdS.css';
 import '../css/Schedule.css';
 import Box from '@mui/material/Box';
@@ -6,7 +7,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import { Typography } from '@mui/material';
 
 class Schedule extends React.Component {
@@ -14,41 +14,35 @@ class Schedule extends React.Component {
     schedule: [],
   }
 
+  componentDidMount() {
+    this.getSchedule();
+  }
+
+  async getSchedule() {
+    try {
+      const scheduleResponse = await axios.get('http://localhost:8089/tutorats/gethoraire');
+      console.log(scheduleResponse);
+      this.setState({
+        schedule: scheduleResponse.data,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   render() {
     return (
       <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
         <Typography className="UdS-title" variant="h6">Vos tutorats à venir :</Typography>
-        <nav>
-          <List>
+        <List>
+          {this.state.schedule.map((item) => (
             <ListItem className="Sch-item" disablePadding>
               <ListItemButton>
-                <ListItemText id="1" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
+                <ListItemText id={item.idTutorat} primary={"Tutorat" + item.numeroTutorat} secondary={item.numeroAPP + " | " + item.dateTutorat} />
               </ListItemButton>
             </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="2" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="3" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="4" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </nav>
+          ))}
+        </List>
       </Box>
     );
   }
