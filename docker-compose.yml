@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:13.1
+    container_name: stu-bd
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+    volumes:
+      - ./SQL/initProf.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+     - 5444:5432
+  auth:
+   image: quay.io/keycloak/keycloak:17.0.0
+   container_name: stu-auth
+   ports:
+     - 8180:8080
+   volumes:
+     - ./auth/data:/var/tmp
+     - ./auth/startup-scripts/init.sh:/docker-entrypoint-sh/init.sh
+   entrypoint: sh -c "/docker-entrypoint-sh/init.sh"
+   environment:
+     DB_VENDOR: "POSTGRES"
+     KEYCLOAK_ADMIN: keycloak
+     KEYCLOAK_ADMIN_PASSWORD: keycloak
