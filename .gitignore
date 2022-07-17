@@ -22,6 +22,6 @@ stu-client/yarn-debug.log*
 stu-client/yarn-error.log*
 
 # ----- API -----
-java/.idea
+java/message/.idea
 java/message/.gradle
 java/message/build
