@@ -2,7 +2,8 @@ import React from 'react';
 import '../css/App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import jwtDecode from "jwt-decode";
-import { Grid } from '@mui/material';
+import Box from '@mui/material/Box';
+import { Grid, Typography } from '@mui/material';
 import NavBar from './NavBar';
 import Login from './Login';
 import Schedule from './Schedule';
@@ -12,16 +13,23 @@ import QuickSwitch from './QuickSwitch';
 
 export default class App extends React.Component {
   state = {
-    sessionToken: "sdfhsdfg",
+    sessionToken: "",
   }
 
   componentDidMount() {
     try {
       const encodedSessionToken = localStorage.getItem("session_token");
-      this.state.sessionToken = jwtDecode(encodedSessionToken);
+      console.log(encodedSessionToken);
+      this.setState({
+        sessionToken: jwtDecode(encodedSessionToken)
+      });
     } catch (e) {
       console.error(e);
     }
+    
+    this.setState({
+      sessionToken: localStorage.getItem("session_token")
+    });
   }
 
   render() {
@@ -40,7 +48,7 @@ export default class App extends React.Component {
                 <BrowserRouter>
                   <Routes>
                     {/* Menu principal */}
-                    <Route index element={<Menu />} path="/home" />
+                    <Route index element={<Menu />} path="/" />
                     {/* Disponibilités */}
                     <Route path="/availabilities" element={<Availabilities />} />
                     {/* Échange rapide */}
@@ -52,7 +60,10 @@ export default class App extends React.Component {
             :
             <Grid container>
               <Grid className="App-login" item xs={12}>
-                <Login />
+                <Box className="UdS-option" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+                  <Typography className="UdS-title" variant="h6">Connectez-vous pour continuer</Typography>
+                  <Login />
+                </Box>
               </Grid>
             </Grid>}
         </body>

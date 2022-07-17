@@ -1,9 +1,11 @@
 import React from 'react';
+import * as sessionService from '../services/sessionService.jsx';
 import '../css/NavBar.css';
 // Composants Material-UI
 import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material';
 // Icônes
 import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 import BellIcon from '@mui/icons-material/Notifications';
 import Notifications from './Notifications';
 
@@ -35,11 +37,14 @@ export default class NavBar extends React.Component {
               <span className="nav-title-md">Système de Tutorat Facile</span>
               <span className="nav-title-sm">STU</span>
             </Typography>
-            {/* Profil */}
-            <IconButton edge="end" className="nav-btn" color="inherit" aria-label="profile">
-              <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>Alex Lajeunesse</Typography>
-              <PersonIcon />
-            </IconButton>
+            {/* Compte */}
+            <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>{localStorage.getItem("session_token") ? <span>Alex Lajeunesse ({localStorage.getItem("cip")})</span> : <span>Déconnecté</span>}</Typography>
+            <PersonIcon />
+            {localStorage.getItem("session_token") ?
+              <IconButton edge="end" className="nav-btn" color="inherit" aria-label="logout" onClick={sessionService.logout}>
+                <LogoutIcon />
+              </IconButton>
+              : <span></span>}
             {/* Notifications */}
             <IconButton edge="end" className="nav-btn" color="inherit" aria-label="notifications" onClick={this.toggleDispNotifications}>
               <BellIcon />

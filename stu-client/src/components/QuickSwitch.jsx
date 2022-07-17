@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import '../css/UdS.css';
 import '../css/QuickSwitch.css';
 import Box from '@mui/material/Box';
-import { Button, Divider, FormGroup, TextField, Typography } from '@mui/material';
+import { Button, FormGroup, TextField, Typography } from '@mui/material';
 
 class QuickSwitch extends React.Component {
     render() {
         return (
             <Box className="UdS-option" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
-                <Link className="UdS-link" to={`/home`}>
+                <Link className="UdS-link" to={`/`}>
                     <Button>Retour</Button>
                 </Link>
                 <Typography className="UdS-title" variant="h6">Entrez le CIP pour l'échange rapide :</Typography>
@@ -39,7 +39,6 @@ class QuickSwitch extends React.Component {
                             },
                         },
                     }} />
-                    <Divider />
                     <Button className="UdS-btn" variant="contained" component="span">
                         Enregistrer
                     </Button>

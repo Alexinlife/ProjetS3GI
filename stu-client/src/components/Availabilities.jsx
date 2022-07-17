@@ -12,7 +12,7 @@ class Availabilities extends React.Component {
     render() {
         return (
             <Box className="UdS-option" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
-                <Link className="UdS-link" to={`/home`}>
+                <Link className="UdS-link" to={`/`}>
                     <Button>Retour</Button>
                 </Link>
                 <Typography className="UdS-title" variant="h6">Changez vos disponibilités :</Typography>
