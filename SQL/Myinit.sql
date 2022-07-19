@@ -310,7 +310,7 @@ CREATE FUNCTION validationForEchangeRapide
 )
     RETURNS TABLE
     (
-        valid BOOLEAN
+        valid BIT
     )
 AS
     $$BEGIN
@@ -323,8 +323,8 @@ AS
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
         AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
-        THEN TRUE
-        ELSE FALSE
+        THEN valid = cast(1 AS BIT)
+        ELSE valid = cast(0 AS BIT)
         END;
 end;$$ LANGUAGE 'plpgsql';
 
