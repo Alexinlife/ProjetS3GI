@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../css/UdS.css';
-import Box from '@mui/material/Box';
-import { Button, Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, Typography } from '@mui/material';
 
 class Availabilities extends React.Component {
     state = {

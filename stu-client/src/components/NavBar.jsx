@@ -38,7 +38,7 @@ export default class NavBar extends React.Component {
               <span className="nav-title-sm">STU</span>
             </Typography>
             {/* Compte */}
-            <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>{localStorage.getItem("session_token") ? <span>Alex Lajeunesse ({localStorage.getItem("cip")})</span> : <span>Déconnecté</span>}</Typography>
+            <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>{localStorage.getItem("session_token") ? <span>{localStorage.getItem("cip")}</span> : <span>Déconnecté</span>}</Typography>
             <PersonIcon />
             {localStorage.getItem("session_token") ?
               <IconButton edge="end" className="nav-btn" color="inherit" aria-label="logout" onClick={sessionService.logout}>

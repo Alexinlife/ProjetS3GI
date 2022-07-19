@@ -2,8 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../css/UdS.css';
 import '../css/QuickSwitch.css';
-import Box from '@mui/material/Box';
-import { Button, FormGroup, TextField, Typography } from '@mui/material';
+import { Box, Button, FormGroup, TextField, Typography } from '@mui/material';
 
 class QuickSwitch extends React.Component {
     render() {
