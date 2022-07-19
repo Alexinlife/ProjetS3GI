@@ -2,16 +2,12 @@ import React from 'react';
 import axios from 'axios';
 import '../css/UdS.css';
 import '../css/Schedule.css';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import { Typography } from '@mui/material';
+import { Box, FormControl, ListItem, ListItemText, Radio, RadioGroup, Typography } from '@mui/material/';
 
 class Schedule extends React.Component {
   state = {
     schedule: [],
+    selected: 0,
   }
 
   componentDidMount() {
@@ -31,18 +27,38 @@ class Schedule extends React.Component {
   }
 
   render() {
+    const handleChange = (event) => {
+      localStorage.setItem("selected_tutorat", event.target.value);
+      this.setState({
+        selected: event.target.value,
+      });
+    }
+
     return (
-      <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
+      <Box>
         <Typography className="UdS-title" variant="h6">Vos tutorats à venir :</Typography>
-        <List>
-          {this.state.schedule.map((item) => (
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id={item.idTutorat} primary={"Tutorat" + item.numeroTutorat} secondary={item.numeroAPP + " | " + item.dateTutorat} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        <FormControl>
+          <RadioGroup
+            aria-labelledby="radio-schedule"
+            name="radio-schedule"
+            value={this.state.selected}
+            onChange={handleChange}
+          >
+            {this.state.schedule.map((item) => (
+              <ListItem className="UdS-item">
+                <Radio value={item.idTutorat}
+                  sx={{
+                    color: "#ffffff",
+                    '&.Mui-checked': {
+                      color: "#4D8406",
+                    },
+                  }}
+                ></Radio>
+                <ListItemText primary={"Tutorat" + item.numeroTutorat} secondary={item.numeroAPP + " | " + item.dateTutorat} />
+              </ListItem>
+            ))}
+          </RadioGroup>
+        </FormControl>
       </Box>
     );
   }
