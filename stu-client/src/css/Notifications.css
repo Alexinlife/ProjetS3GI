@@ -1,5 +1,8 @@
-.notifications {
+.ntf-accept {
+    margin-left: 10px !important;
+}
+
+.ntf-notifications {
     display: flex;
     flex-direction: row-reverse;
-    margin-right: 0;
 }
