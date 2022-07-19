@@ -1,53 +1,39 @@
 import React from 'react';
 import '../css/UdS.css';
 import '../css/Notifications.css';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import { Container } from '@mui/material';
+import { Box, Button, List, ListItem, ListItemText } from '@mui/material/';
 
- export default class Schedule extends React.Component {
+export default class Schedule extends React.Component {
   state = {
     notifications: [],
   }
 
   render() {
     return (
-      <Container className="notifications" sx={{ width: '100%', maxWidth: 360, bgcolor: 'background:paper' }}>
-        <nav>
-          <List>
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="1" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="2" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="3" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-            <Divider />
-            <ListItem className="Sch-item" disablePadding>
-              <ListItemButton>
-                <ListItemText id="4" primary="Tutorat 1" />
-                <ListItemText className="Sch-time" primary="07/06/22 9:00" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </nav>
-      </Container>
+      <Box className="ntf-notifications">
+        <List>
+          <ListItem className="UdS-item">
+            <ListItemText primary={"Tutorat 1"} secondary={"s6eapp2 | 07/06/22 9:00"} />
+            <Button className="ntf-accept" variant="text">Accepter</Button>
+            <Button variant="text">Refuser</Button>
+          </ListItem>
+          <ListItem className="UdS-item">
+            <ListItemText primary={"Tutorat 1"} secondary={"s6eapp2 | 07/06/22 9:00"} />
+            <Button variant="text">Accepter</Button>
+            <Button variant="text">Refuser</Button>
+          </ListItem>
+          <ListItem className="UdS-item">
+            <ListItemText primary={"Tutorat 1"} secondary={"s6eapp2 | 07/06/22 9:00"} />
+            <Button variant="text">Accepter</Button>
+            <Button variant="text">Refuser</Button>
+          </ListItem>
+          <ListItem className="UdS-item">
+            <ListItemText primary={"Tutorat 1"} secondary={"s6eapp2 | 07/06/22 9:00"} />
+            <Button variant="text">Accepter</Button>
+            <Button variant="text">Refuser</Button>
+          </ListItem>
+        </List>
+      </Box>
     );
   }
 }
