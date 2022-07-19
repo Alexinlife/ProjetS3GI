@@ -283,6 +283,7 @@ $$
 CREATE FUNCTION validationTutorat (
     idTutorat INT
 )
+
     RETURNS BOOLEAN
 AS
 $$
