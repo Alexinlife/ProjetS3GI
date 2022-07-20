@@ -49,10 +49,10 @@ CREATE TABLE Role_utilisateur
 CREATE TABLE Disponibilité_Utilisateur
 (
     cip CHAR(8) NOT NULL,
-    id_plage INT NOT NULL,
-    PRIMARY KEY (cip, id_plage),
+    idTutorat INT NOT NULL,
+    PRIMARY KEY (cip, idtutorat),
     FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
-    FOREIGN KEY (id_plage) REFERENCES Plage(id)
+    FOREIGN KEY (idtutorat) REFERENCES tutorat(id)
 );
 
 CREATE TABLE APP
@@ -158,8 +158,8 @@ CREATE FUNCTION getHoraireUtilisateur(
                     idTutorat INT,
                     dateTutorat TIMESTAMP,
                     numeroTutorat INT,
-                    debutTutorat TIMESTAMPTZ,
                     numeroAPP VARCHAR(8),
+                    debutTutorat TIMESTAMPTZ,
                     sessionApp VARCHAR(3)
                   )
 AS
@@ -192,7 +192,7 @@ $$
 BEGIN
         CASE WHEN EXISTS
             (
-                SELECT * FROM Utilisateur U WHERE U.cip = 'doyf1501'
+                SELECT * FROM Utilisateur U WHERE U.cip = validCIP.cip
             )
             THEN RETURN TRUE;
             ELSE RETURN FALSE;
@@ -399,13 +399,46 @@ CREATE FUNCTION getDipsoTutorat(
 )
 RETURNS TABLE
 (
-    idTutorat INT,
-    cip VARCHAR(8)
+    cip VARCHAR(8),
+    idTutorat INT
 )
 AS
 $$
 BEGIN
+    CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
+    INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
+        INNER JOIN tutorat T ON t.id = DU.idtutorat
+        INNER JOIN APP A on A.id = T.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        INNER JOIN Plage P on P.id = T.plage_id
+        WHERE T.date = getDipsoTutorat.date
+        AND P.debut = getDipsoTutorat.debut
+        AND A.id = getDipsoTutorat.app
+        AND S.code = getDipsoTutorat.session;
+    RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
+END;
+$$
+    LANGUAGE 'plpgsql';
 
+CREATE FUNCTION getListTuto
+(
+    numero_tuto INT,
+    app_id INT
+)
+RETURNS TABLE
+(
+    id INT,
+    date TIMESTAMPTZ,
+    plage_id INT
+)
+AS
+$$
+BEGIN
+    RETURN QUERY SELECT
+        T.id, T.date, T.plage_id
+    FROM Tutorat T
+    WHERE T.numero = getListTuto.numero_tuto
+        AND T.app_id = getListTuto.app_id;
 END;
 $$
     LANGUAGE 'plpgsql';
