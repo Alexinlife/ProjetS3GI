@@ -192,7 +192,7 @@ $$
 BEGIN
         CASE WHEN EXISTS
             (
-                SELECT * FROM Utilisateur U WHERE U.cip = 'doyf1501'
+                SELECT * FROM Utilisateur U WHERE U.cip = validCIP.cip
             )
             THEN RETURN TRUE;
             ELSE RETURN FALSE;
