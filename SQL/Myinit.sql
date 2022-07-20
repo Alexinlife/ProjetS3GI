@@ -46,15 +46,6 @@ CREATE TABLE Role_utilisateur
     FOREIGN KEY (cip) REFERENCES Utilisateur(cip)
 );
 
-CREATE TABLE Disponibilité_Utilisateur
-(
-    cip CHAR(8) NOT NULL,
-    idTutorat INT NOT NULL,
-    PRIMARY KEY (cip, idtutorat),
-    FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
-    FOREIGN KEY (idtutorat) REFERENCES tutorat(id)
-);
-
 CREATE TABLE APP
 (
     id SERIAL,
@@ -67,7 +58,7 @@ CREATE TABLE APP
 
 CREATE TABLE Tutorat
 (
-    date TIMESTAMP NOT NULL,
+    date DATE NOT NULL,
     id SERIAL,
     numero INT NOT NULL,
     APP_id INT NOT NULL,
@@ -75,6 +66,15 @@ CREATE TABLE Tutorat
     PRIMARY KEY (id),
     FOREIGN KEY (APP_id) REFERENCES APP(id),
     FOREIGN KEY (plage_id) REFERENCES Plage(id)
+);
+
+CREATE TABLE Disponibilité_Utilisateur
+(
+    cip CHAR(8) NOT NULL,
+    idTutorat INT NOT NULL,
+    PRIMARY KEY (cip, idtutorat),
+    FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
+    FOREIGN KEY (idtutorat) REFERENCES tutorat(id)
 );
 
 CREATE TABLE Tutorat_Utilisateur
@@ -441,4 +441,43 @@ BEGIN
 END;
 $$
     LANGUAGE 'plpgsql';
+
+CREATE FUNCTION makeEchange
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    app VARCHAR(8),
+    session VARCHAR(3),
+    dateTuto DATE
+)
+RETURNS
+    BOOLEAN
+AS $$
+    DECLARE tutorat1 INT;
+    DECLARE tutorat2 INT;
+BEGIN
+    tutorat1 := (SELECT TU.tutorat_id FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T ON TU.tutorat_id = T.id
+        INNER JOIN APP A on T.APP_id = A.id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE TU.cip = makeechange.cip1
+        AND A.numero = makeechange.app
+        AND S.code = makeechange.session
+        AND T.date = makeechange.dateTuto);
+    tutorat2 := (SELECT TU.tutorat_id FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T ON TU.tutorat_id = T.id
+        INNER JOIN APP A on T.APP_id = A.id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE TU.cip = makeechange.cip2
+        AND A.numero = makeechange.app
+        AND S.code = makeechange.session
+        AND T.date = makeechange.dateTuto);
+    UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
+        WHERE TU.cip = makeechange.cip1 AND TU.tutorat_id = tutorat1;
+    UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat1
+        WHERE TU.cip = makeechange.cip2 AND TU.tutorat_id = tutorat2;
+    INSERT INTO log (timestamp, message) VALUES (NOW(),format('Echange cip : %s , %s Tutorat : %s  , ' ||
+        '%s APP : %s Session : %s Date tutorat : %s', cip1, cip2, tutorat1, tutorat2, app, session, dateTuto));
+    RETURN TRUE;
+end;$$ LANGUAGE 'plpgsql';
 
