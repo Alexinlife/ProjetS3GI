@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface horaireMapper {
-    List<Horaire> selectHoraire();
+    List<Horaire> selectHoraire(String cip1);
 
     //boolean validerEchangeRapide(String cip1, String cip2, String cours, String tutorat);
 

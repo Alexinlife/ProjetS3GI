@@ -11,6 +11,6 @@
            debutTutorat,
            numeroAPP,
            sessionApp
-        from gethoraireutilisateur('laja1501')
+        from gethoraireutilisateur(#{cip})
     </select>
 </mapper>

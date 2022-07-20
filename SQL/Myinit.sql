@@ -300,7 +300,7 @@ END
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION validationForEchangeRapide
+CREATE OR replace FUNCTION validationForEchangeRapide
 (
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
@@ -311,7 +311,7 @@ CREATE FUNCTION validationForEchangeRapide
 )
     RETURNS TABLE
     (
-        valid BIT
+        valid boolean
     )
 AS
     $$BEGIN
@@ -324,8 +324,8 @@ AS
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
         AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
-        THEN valid = cast(1 AS BIT)
-        ELSE valid = cast(0 AS BIT)
+        THEN valid is true
+        ELSE valid is false
         END;
 end;$$ LANGUAGE 'plpgsql';
 

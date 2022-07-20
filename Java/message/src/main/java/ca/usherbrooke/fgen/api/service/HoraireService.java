@@ -27,11 +27,12 @@ public class HoraireService {
     horaireMapper horaireMapper;
 
     @GET
-    @Path("gethoraire")
+    @Path("gethoraire/{cip}")
 
     public List<Horaire> getHoraire(
+            @PathParam("cip") String cip
             ) {
-        List<Horaire> horaires = horaireMapper.selectHoraire();
+        List<Horaire> horaires = horaireMapper.selectHoraire(cip);
         System.out.print(horaires);
         return (horaires);
     }
