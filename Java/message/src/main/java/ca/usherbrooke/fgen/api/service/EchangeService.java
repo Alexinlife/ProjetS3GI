@@ -31,28 +31,28 @@ public class EchangeService {
             @PathParam("dateTuto") Timestamp dateTuto
     )
     {
-        Echange echanges = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
-        if(echanges.valid)
+        Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
+        if(valid.valid)
         {
             System.out.println("true");
             System.out.println(echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2));
 
-            Echange echanges2 = echangeMapper.EchangeRapide(cip1, cip2, app, session, dateTuto);
+            Echange echanges = echangeMapper.EchangeRapide(cip1, cip2, app, session, dateTuto);
 
-            if(echanges2.valid)
+            if(echanges.valid)
             {
-                System.out.println("we good");
+                System.out.println("Echange effectue");
                 return;
             }
             else
             {
-                System.out.println("We fucked up");
+                System.out.println("Erreur echange");
                 return;
             }
         }
         else {
-            System.out.println(echanges.valid);
-            System.out.println("trash");
+            System.out.println(valid.valid);
+            System.out.println("False");
             return;
         }
     }
@@ -68,14 +68,14 @@ public class EchangeService {
             @PathParam("idtutorat2") int idtutorat2
     )
     {
-        Echange echanges = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
-        if(echanges.valid)
+        Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
+        if(valid.valid)
         {
             Echange echange = echangeMapper.Matchmaking();
             return;
         }
         else {
-            System.out.println("sauce");
+            System.out.println("Erreur");
             return;
         }
     }
