@@ -443,7 +443,7 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION makeEchange
+CREATE FUNCTION makeEchange
 (
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
@@ -451,11 +451,8 @@ CREATE OR REPLACE FUNCTION makeEchange
     session VARCHAR(3),
     dateTuto DATE
 )
-RETURNS TABLE
-    (
-        valid BOOLEAN
-    )
-
+RETURNS
+    BOOLEAN
 AS $$
     DECLARE tutorat1 INT;
     DECLARE tutorat2 INT;
