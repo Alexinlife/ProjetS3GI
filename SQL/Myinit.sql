@@ -101,12 +101,12 @@ CREATE TABLE Echange
     demandeur VARCHAR(8),
     cible VARCHAR(8),
     tutorat_demandeur int,
-    tutorat_cibe int,
+    tutorat_cible int,
     confirme int,
     -- 1 confirme  , 0 en attente, -1 annule
     PRIMARY KEY (id),
     FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
-    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id),
+    FOREIGN KEY (tutorat_cible) REFERENCES Tutorat(id),
     FOREIGN KEY (demandeur) REFERENCES Utilisateur(cip),
     FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
 );
@@ -443,7 +443,7 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION makeEchange
+CREATE OR REPLACE FUNCTION makeEchange
 (
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
@@ -451,8 +451,11 @@ CREATE FUNCTION makeEchange
     session VARCHAR(3),
     dateTuto DATE
 )
-RETURNS
-    BOOLEAN
+RETURNS TABLE
+    (
+        valid BOOLEAN
+    )
+
 AS $$
     DECLARE tutorat1 INT;
     DECLARE tutorat2 INT;
