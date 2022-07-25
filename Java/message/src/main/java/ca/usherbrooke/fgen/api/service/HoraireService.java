@@ -17,7 +17,7 @@ import java.awt.print.*;
 import java.util.stream.Collectors;
 
 
-@Path("/tutorats")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 

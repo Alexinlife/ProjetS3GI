@@ -1,7 +1,7 @@
 package ca.usherbrooke.fgen.api.business;
 
 public class Echange {
-    public boolean valid = true;
+    public boolean valid;
 
     public String cip1;
     public String cip2;

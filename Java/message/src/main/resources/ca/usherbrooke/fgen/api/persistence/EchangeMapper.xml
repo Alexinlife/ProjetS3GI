@@ -6,20 +6,7 @@
 
     <select id="getValidation" resultType="ca.usherbrooke.fgen.api.business.Echange">
     select valid
-    from validationforechangerapide(cip1, cip2, app, session, idtutorat1, idtutorat2)
-    where
-        (cip1,
-         cip2,
-         app,
-         session,
-         idtutorat1,
-         idtutorat2) =
-        (coalesce(#{cip1}, cip1),
-         coalesce(#{cip2}, cip2),
-         coalesce(#{app}, app),
-         coalesce(#{session}, session),
-         coalesce(#{idtutorat1}, idtutorat1),
-         coalesce(#{idtutorat2}, idtutorat2))
+    from validationforechangerapide(#{arg0},#{arg1},#{arg2},#{arg3},#{arg4},#{arg5})
     </select>
 
     <select id="EchangeRapide" resultType="ca.usherbrooke.fgen.api.business.Echange">

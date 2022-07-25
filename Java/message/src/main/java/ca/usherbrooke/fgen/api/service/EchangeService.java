@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 
-@Path("/tutorats")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 
@@ -19,9 +19,9 @@ public class EchangeService {
     EchangeMapper echangeMapper;
 
     @GET
-    @Path("echange-rapide/{cip1}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}")
+    @Path("echange-rapide/{cip}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}")
     public void EchangeRapide(
-            @PathParam("cip1") String cip1,
+            @PathParam("cip") String cip1,
             @PathParam("cip2") String cip2,
             @PathParam("app") String app,
             @PathParam("session") String session,
@@ -41,14 +41,6 @@ public class EchangeService {
             System.out.println("trash");
             return;
         }
-        /*if(echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2) == true)
-        {
-            System.out.println("lets go boys");
-            //Echange echange = echangeMapper.EchangeRapide();
-        }
-        else{
-            System.out.println("sauce");
-        }*/
     }
 
     @GET

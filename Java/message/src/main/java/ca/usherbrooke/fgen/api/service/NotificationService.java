@@ -20,13 +20,12 @@ public class NotificationService {
     NotificationMapper notificationMapper;
 
     @GET
-    @Path("getnotification/{Notification}/{Heure}")
+    @Path("getnotification/{cip}")
     public List<Notification> getNotifications(
-            @PathParam("Notification") String Notification,
-            @PathParam("Heure") Date Heure
+            @PathParam("cip") String cip
     )
     {
-        List<Notification> notifications = notificationMapper.selectNotifications(Notification, Heure);
+        List<Notification> notifications = notificationMapper.selectNotifications(cip);
         return notifications;
     }
 }
