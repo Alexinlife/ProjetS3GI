@@ -10,5 +10,5 @@ import java.util.List;
 
 @Mapper
 public interface NotificationMapper {
-    List<Notification> selectNotifications(String notifications, Date heure);
+    List<Notification> selectNotifications(String cip);
 }

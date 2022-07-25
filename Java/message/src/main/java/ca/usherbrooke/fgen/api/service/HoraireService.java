@@ -17,7 +17,7 @@ import java.awt.print.*;
 import java.util.stream.Collectors;
 
 
-@Path("/tutorats")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 
@@ -27,11 +27,12 @@ public class HoraireService {
     horaireMapper horaireMapper;
 
     @GET
-    @Path("gethoraire")
+    @Path("gethoraire/{cip}")
 
     public List<Horaire> getHoraire(
+            @PathParam("cip") String cip
             ) {
-        List<Horaire> horaires = horaireMapper.selectHoraire();
+        List<Horaire> horaires = horaireMapper.selectHoraire(cip);
         System.out.print(horaires);
         return (horaires);
     }
