@@ -17,7 +17,7 @@ CREATE TABLE Role
 
 CREATE TABLE Log
 (
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     message VARCHAR(255) NOT NULL,
     id SERIAL,
     PRIMARY KEY (id)
@@ -31,8 +31,8 @@ CREATE TABLE Session
 
 CREATE TABLE Plage
 (
-    debut TIMESTAMPTZ NOT NULL,
-    fin TImESTAMPTZ NOT NULL,
+    debut TIMESTAMP NOT NULL,
+    fin timestamp NOT NULL,
     id SERIAL,
     PRIMARY KEY (id)
 );
@@ -58,7 +58,7 @@ CREATE TABLE APP
 
 CREATE TABLE Tutorat
 (
-    date DATE NOT NULL,
+    date timestamp NOT NULL,
     id SERIAL,
     numero INT NOT NULL,
     APP_id INT NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE departement_utilisateurs
 
 CREATE TABLE Echange
 (
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     id SERIAL,
     demandeur VARCHAR(8),
     cible VARCHAR(8),
@@ -120,7 +120,7 @@ CREATE INDEX ind_numero_app ON APP(numero);
 
 CREATE FUNCTION getGroupeTutoratHeure(
     date DATE,
-    debut TIMESTAMPTZ,
+    debut TIMESTAMP,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -156,10 +156,10 @@ CREATE FUNCTION getHoraireUtilisateur(
 )
     RETURNS TABLE (
                     idTutorat INT,
-                    dateTutorat timestamptz,
+                    dateTutorat timestamp,
                     numeroTutorat INT,
+                    debutTutorat timestamp,
                     numeroAPP VARCHAR(8),
-                    debutTutorat timestamptz,
                     sessionApp VARCHAR(3)
                   )
 AS
@@ -247,7 +247,7 @@ CREATE FUNCTION returnHeureID
     )
 RETURNS TABLE
     (
-        heure TIMESTAMPTZ
+        heure TIMESTAMP
     )
 AS
 $$BEGIN
@@ -338,7 +338,7 @@ CREATE FUNCTION getGroupeTutoratJour(
                     cip VARCHAR,
                     nom VARCHAR,
                     prenom VARCHAR,
-                    heure TIMESTAMPTZ
+                    heure TIMESTAMP
                   )
 AS
 $$
@@ -367,7 +367,7 @@ CREATE FUNCTION getNotif
     )
     RETURNS TABLE
     (
-        temps TIMESTAMPTZ,
+        temps TIMESTAMP,
         id INT,
         demandeur VARCHAR(8),
         cible VARCHAR(8),
@@ -393,7 +393,7 @@ AS
 
 CREATE FUNCTION getDipsoTutorat(
     date DATE,
-    debut TIMESTAMPTZ,
+    debut TIMESTAMP,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -428,7 +428,7 @@ CREATE FUNCTION getListTuto
 RETURNS TABLE
 (
     id INT,
-    date TIMESTAMPTZ,
+    date TIMESTAMP,
     plage_id INT
 )
 AS
