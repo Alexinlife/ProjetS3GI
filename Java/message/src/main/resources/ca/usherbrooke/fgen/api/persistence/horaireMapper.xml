@@ -12,5 +12,7 @@
            debutTutorat,
            sessionApp
         from gethoraireutilisateur(#{cip})
+        order by datetutorat
+        limit 3
     </select>
 </mapper>
