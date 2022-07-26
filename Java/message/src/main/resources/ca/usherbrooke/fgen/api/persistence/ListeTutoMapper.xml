@@ -8,6 +8,6 @@
     select id,
            date,
            plage_id
-        from getlisttuto(numero_tuto,app_id)
+        from getlisttuto(#{arg0},#{arg1})
     </select>
 </mapper>

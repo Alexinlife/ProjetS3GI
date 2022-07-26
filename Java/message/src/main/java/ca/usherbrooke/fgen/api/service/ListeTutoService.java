@@ -27,11 +27,11 @@ public class ListeTutoService {
     ListeTutoMapper ListeTutoMapper;
 
     @GET
-    @Path("getTuto/{numero-tuto}/{app-id}")
+    @Path("getTuto/{numTuto}/{appId}")
 
     public List<ListeTuto> getTuto(
-            @PathParam("numero-tuto") Integer numTuto,
-            @PathParam("app-id") Integer appId
+            @PathParam("numTuto") Integer numTuto,
+            @PathParam("appId") Integer appId
             ) {
         List<ListeTuto> tutos = ListeTutoMapper.listerTuto(numTuto, appId);
         System.out.print(tutos);

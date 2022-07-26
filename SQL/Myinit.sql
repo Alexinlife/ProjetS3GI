@@ -325,7 +325,7 @@ AS
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
         AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
         THEN valid is true
-        ELSE valid is false
+        Else valid is false
         END;
 end;$$ LANGUAGE 'plpgsql';
 

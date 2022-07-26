@@ -52,13 +52,12 @@ public class EchangeService {
         }
         else {
             System.out.println(valid.valid);
-            System.out.println("False");
             return;
         }
     }
 
     @GET
-    @Path("Matchmaking/{cip1}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}")
+    @Path("matchmaking/{cip1}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}")
     public void Matchmaking(
             @PathParam("cip1") String cip1,
             @PathParam("cip2") String cip2,

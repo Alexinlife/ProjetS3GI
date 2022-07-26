@@ -8,6 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface ListeTutoMapper {
-    List<ListeTuto> listerTuto(Integer numTuto_, Integer appId_);
+    List<ListeTuto> listerTuto(Integer numTuto, Integer appId);
 
 }
