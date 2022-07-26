@@ -10,7 +10,8 @@
     </select>
 
     <select id="EchangeRapide" resultType="ca.usherbrooke.fgen.api.business.Echange">
-    select makeechange(#{arg0},#{arg1},#{arg2},#{arg3},#{arg4})
+    select
+    from makeechange(#{arg0},#{arg1},#{arg2},#{arg3},#{arg4},#{arg5})
     </select>
 
     <select id="Matchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">

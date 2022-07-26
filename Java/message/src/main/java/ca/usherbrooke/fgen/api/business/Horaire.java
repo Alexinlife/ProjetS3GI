@@ -6,7 +6,7 @@ public class Horaire {
     public int idTutorat;
     public Timestamp dateTutorat;
     public int numeroTutorat;
-    public Timestamp debutTutorat ;
     public String numeroAPP;
+    public Timestamp debutTutorat;
     public String sessionApp;
 }

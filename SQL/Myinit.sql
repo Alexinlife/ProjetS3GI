@@ -156,10 +156,10 @@ CREATE FUNCTION getHoraireUtilisateur(
 )
     RETURNS TABLE (
                     idTutorat INT,
-                    dateTutorat TIMESTAMP,
+                    dateTutorat timestamptz,
                     numeroTutorat INT,
                     numeroAPP VARCHAR(8),
-                    debutTutorat TIMESTAMPTZ,
+                    debutTutorat timestamptz,
                     sessionApp VARCHAR(3)
                   )
 AS
@@ -192,7 +192,7 @@ $$
 BEGIN
         CASE WHEN EXISTS
             (
-                SELECT * FROM Utilisateur U WHERE U.cip = validCIP.cip
+                SELECT * FROM Utilisateur U WHERE U.cip = validationCIP.cip
             )
             THEN RETURN TRUE;
             ELSE RETURN FALSE;
@@ -383,7 +383,7 @@ AS
                          E.demandeur,
                          E.cible,
                          E.tutorat_demandeur,
-                         E.tutorat_cibe,
+                         E.tutorat_cible,
                          E.confirme
                          FROM echange E
                         WHERE getNotif.cip =E.cible;

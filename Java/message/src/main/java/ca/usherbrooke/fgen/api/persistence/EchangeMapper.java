@@ -11,6 +11,6 @@ import java.util.List;
 public interface EchangeMapper {
 
     Echange getValidation(String cip1, String cip2, String app, String session, int idtutorat1, int idtutorat2);
-    Echange EchangeRapide(String cip1, String cip2, String app, String session, Timestamp datetuto);
+    Echange EchangeRapide(String cip1, String cip2, String app, String session, String datetuto);
     Echange Matchmaking();
 }

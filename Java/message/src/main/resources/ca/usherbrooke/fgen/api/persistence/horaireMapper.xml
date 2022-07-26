@@ -8,8 +8,8 @@
     select idTutorat,
            dateTutorat,
            numeroTutorat,
-           debutTutorat,
            numeroAPP,
+           debutTutorat,
            sessionApp
         from gethoraireutilisateur(#{cip})
     </select>

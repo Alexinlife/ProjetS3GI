@@ -28,7 +28,7 @@ public class EchangeService {
             @PathParam("session") String session,
             @PathParam("idtutorat1") int idtutorat1,
             @PathParam("idtutorat2") int idtutorat2,
-            @PathParam("dateTuto") Timestamp dateTuto
+            @PathParam("dateTuto") String dateTuto
     )
     {
         Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
