@@ -6,6 +6,7 @@ import ca.usherbrooke.fgen.api.persistence.EchangeMapper;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -20,15 +21,14 @@ public class EchangeService {
     EchangeMapper echangeMapper;
 
     @GET
-    @Path("echange-rapide/{cip}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}/{dateTuto}")
+    @Path("echange-rapide/{cip}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}")
     public void EchangeRapide(
             @PathParam("cip") String cip1,
             @PathParam("cip2") String cip2,
             @PathParam("app") String app,
             @PathParam("session") String session,
             @PathParam("idtutorat1") int idtutorat1,
-            @PathParam("idtutorat2") int idtutorat2,
-            @PathParam("dateTuto") Timestamp dateTuto
+            @PathParam("idtutorat2") int idtutorat2
     )
     {
         Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
@@ -37,7 +37,7 @@ public class EchangeService {
             System.out.println("true");
             //System.out.println(echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2));
 
-            echangeMapper.EchangeRapide(cip1, cip2, app, session, dateTuto);
+            echangeMapper.EchangeRapide(cip1, cip2, app, session);
         }
         else {
             System.out.println(valid.valid);
