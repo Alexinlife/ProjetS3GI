@@ -368,7 +368,7 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION getNotif
+CREATE FUNCTION getEchange
     (
         cip VARCHAR(8)
     )
@@ -393,7 +393,7 @@ AS
                          E.tutorat_cible,
                          E.confirme
                          FROM echange E
-                        WHERE getNotif.cip =E.cible;
+                        WHERE getEchange.cip =E.cible;
     END;$$
     LANGUAGE 'plpgsql';
 
@@ -412,6 +412,8 @@ AS
 $$
     DECLARE NbTutorat INT;
     DECLARE nbMAX INT;
+    DECLARE cnt INT;
+    DECLARE nbPersonne
 BEGIN
     CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
     INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
@@ -429,7 +431,15 @@ BEGIN
         WHERE t.date = getDispoTutorat.date
         AND A2.numero = getDispoTutorat.app
         AND S2.code = getDispoTutorat.session;
-    --NbTutorat := SELECT COUNT(*);
+    NbTutorat := (SELECT COUNT(*) FROM listeTutorat);
+    cnt := 0;
+    nbMax = 0;
+    FOR cnt IN 1..nbTutorat LOOP
+        nbPersonne :=
+        (
+        SELECT COUNT(*) FROM tutorat_utilisateur
+        )
+    END LOOP;
     --nbMax := max()
     RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
@@ -518,13 +528,70 @@ CREATE FUNCTION checkInDispo
 (
     idTutorat INT
 )
-RETURNS TABLE
-(
-    cip VARCHAR(8)
-)
+    RETURNS TABLE
+            (
+                cip VARCHAR(8)
+            )
 AS $$
 BEGIN
     RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
-        WHERE D.idtutorat = checkInDispo.idTutorat;
+                 WHERE D.idtutorat = checkInDispo.idTutorat;
 END;$$ LANGUAGE 'plpgsql';
 
+CREATE FUNCTION createMatchMaking
+(
+    cipReceveur VARCHAR(8),
+    tutoratReceveur INT,
+    tutoratSouhaite INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    INSERT INTO matchmaking(cip_receveur, tutorat_receveur, tutorat_souhaite)
+        VALUES
+        (
+            createMatchMaking.cipReceveur,
+            createMatchMaking.tutoratReceveur,
+            createMatchMaking.tutoratSouhaite
+        );
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION createEchange
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    CASE WHEN EXISTS
+    (
+        SELECT * FROM echange E
+            WHERE createEchange.demandeur = E.demandeur
+            AND createEchange.cible = E.cible
+            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
+            AND createEchange.tutorat_cible = E.tutorat_cible
+    )
+    THEN
+        UPDATE echange E SET E.confirme = createEchange.confirme
+            WHERE createEchange.demandeur = E.demandeur
+            AND createEchange.cible = E.cible
+            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
+            AND createEchange.tutorat_cible = E.tutorat_cible
+    ELSE
+        INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
+            VALUES
+            (
+                now(),
+                createEchange.demandeur,
+                createEchange.cible,
+                createEchange.tutorat_demandeur
+                createEchange.tutorat_cible
+                createEchange.confirme
+            );
+    END CASE;
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
