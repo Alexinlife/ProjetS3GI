@@ -324,7 +324,7 @@ AS
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
         AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
-        as valid;
+        AS valid;
 end;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION getGroupeTutoratJour(
