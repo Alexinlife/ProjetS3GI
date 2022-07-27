@@ -468,6 +468,9 @@ BEGIN
         WHERE TU.cip = makeechange.cip2
         AND A.numero = makeechange.app
         AND S.code = makeechange.session);
+    DELETE FROM Tutorat_Utilisateur TU
+        WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
+        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechange.cip1 AND TU.tutorat_id = tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat1
