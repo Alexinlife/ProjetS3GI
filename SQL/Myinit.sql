@@ -192,6 +192,33 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
+CREATE OR REPLACE FUNCTION getHoraireUtilisateurExclu(
+    date timestamp,
+    app varchar(8),
+    session varchar(3)
+)
+    RETURNS TABLE (
+                    plage timestamp,
+                    plage_id int
+                  )
+AS
+$$
+BEGIN
+    RETURN QUERY SELECT
+                     P.debut,
+                     T.plage_id
+
+                 from tutorat T
+                    INNER JOIN app A on A.id = T.app_id
+                    INNER JOIN plage P on T.plage_id = P.id
+                    INNER JOIN session S on S.code = A.session_code
+                 where Date(getHoraireUtilisateurExclu.date) = date(T.date)
+                 and getHoraireUtilisateurExclu.app = A.numero
+                 and getHoraireUtilisateurExclu.session = S.code;
+END;
+$$
+    LANGUAGE 'plpgsql';
+
 CREATE FUNCTION validationCIP (
     cip VARCHAR(8)
 )
