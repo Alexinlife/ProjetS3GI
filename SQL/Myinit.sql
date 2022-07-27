@@ -17,7 +17,7 @@ CREATE TABLE Role
 
 CREATE TABLE Log
 (
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     message VARCHAR(255) NOT NULL,
     id SERIAL,
     PRIMARY KEY (id)
@@ -31,8 +31,8 @@ CREATE TABLE Session
 
 CREATE TABLE Plage
 (
-    debut TIMESTAMPTZ NOT NULL,
-    fin TImESTAMPTZ NOT NULL,
+    debut TIMESTAMP NOT NULL,
+    fin timestamp NOT NULL,
     id SERIAL,
     PRIMARY KEY (id)
 );
@@ -58,7 +58,7 @@ CREATE TABLE APP
 
 CREATE TABLE Tutorat
 (
-    date DATE NOT NULL,
+    date timestamp NOT NULL,
     id SERIAL,
     numero INT NOT NULL,
     APP_id INT NOT NULL,
@@ -96,21 +96,30 @@ CREATE TABLE departement_utilisateurs
 
 CREATE TABLE Echange
 (
-    timestamp TIMESTAMPTZ NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     id SERIAL,
     demandeur VARCHAR(8),
     cible VARCHAR(8),
     tutorat_demandeur int,
-    tutorat_cibe int,
+    tutorat_cible int,
     confirme int,
     -- 1 confirme  , 0 en attente, -1 annule
     PRIMARY KEY (id),
     FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat(id),
-    FOREIGN KEY (tutorat_cibe) REFERENCES Tutorat(id),
+    FOREIGN KEY (tutorat_cible) REFERENCES Tutorat(id),
     FOREIGN KEY (demandeur) REFERENCES Utilisateur(cip),
     FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
 );
 
+CREATE TABLE matchmaking
+(
+    cip_receveur VARCHAR(8),
+    tutorat_receveur INT,
+    tutorat_souhaite  INT,
+    FOREIGN KEY (cip_receveur) REFERENCES Utilisateur (cip),
+    FOREIGN KEY (tutorat_receveur) REFERENCES Tutorat (id),
+    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
+);
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
 CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
@@ -120,7 +129,7 @@ CREATE INDEX ind_numero_app ON APP(numero);
 
 CREATE FUNCTION getGroupeTutoratHeure(
     date DATE,
-    debut TIMESTAMPTZ,
+    debut TIMESTAMP,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -156,10 +165,10 @@ CREATE FUNCTION getHoraireUtilisateur(
 )
     RETURNS TABLE (
                     idTutorat INT,
-                    dateTutorat TIMESTAMP,
+                    dateTutorat timestamp,
                     numeroTutorat INT,
+                    debutTutorat timestamp,
                     numeroAPP VARCHAR(8),
-                    debutTutorat TIMESTAMPTZ,
                     sessionApp VARCHAR(3)
                   )
 AS
@@ -247,7 +256,7 @@ CREATE FUNCTION returnHeureID
     )
 RETURNS TABLE
     (
-        heure TIMESTAMPTZ
+        heure TIMESTAMP
     )
 AS
 $$BEGIN
@@ -283,6 +292,7 @@ $$
 CREATE FUNCTION validationTutorat (
     idTutorat INT
 )
+
     RETURNS BOOLEAN
 AS
 $$
@@ -299,7 +309,7 @@ END
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION validationForEchangeRapide
+CREATE OR replace FUNCTION validationForEchangeRapide
 (
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
@@ -310,12 +320,12 @@ CREATE FUNCTION validationForEchangeRapide
 )
     RETURNS TABLE
     (
-        valid BOOLEAN
+        valid boolean
     )
 AS
     $$BEGIN
-        RETURN QUERY SELECT
-    CASE WHEN validationCIP(validationForEchangeRapide.cip1)
+    RETURN QUERY SELECT
+        validationCIP(validationForEchangeRapide.cip1)
         AND validationCIP(validationForEchangeRapide.cip2)
         AND validationCour(validationForEchangeRapide.app, validationForEchangeRapide.session)
         AND validationTutorat(validationForEchangeRapide.idTutorat1)
@@ -323,9 +333,7 @@ AS
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
         AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
-        THEN TRUE
-        ELSE FALSE
-        END;
+        AS valid;
 end;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION getGroupeTutoratJour(
@@ -337,7 +345,7 @@ CREATE FUNCTION getGroupeTutoratJour(
                     cip VARCHAR,
                     nom VARCHAR,
                     prenom VARCHAR,
-                    heure TIMESTAMPTZ
+                    heure TIMESTAMP
                   )
 AS
 $$
@@ -366,7 +374,7 @@ CREATE FUNCTION getNotif
     )
     RETURNS TABLE
     (
-        temps TIMESTAMPTZ,
+        temps TIMESTAMP,
         id INT,
         demandeur VARCHAR(8),
         cible VARCHAR(8),
@@ -382,7 +390,7 @@ AS
                          E.demandeur,
                          E.cible,
                          E.tutorat_demandeur,
-                         E.tutorat_cibe,
+                         E.tutorat_cible,
                          E.confirme
                          FROM echange E
                         WHERE getNotif.cip =E.cible;
@@ -390,9 +398,8 @@ AS
     LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION getDipsoTutorat(
+CREATE or replace FUNCTION getDispoTutorat(
     date DATE,
-    debut TIMESTAMPTZ,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -403,6 +410,8 @@ RETURNS TABLE
 )
 AS
 $$
+    DECLARE NbTutorat INT;
+    DECLARE nbMAX INT;
 BEGIN
     CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
     INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
@@ -410,10 +419,18 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
         INNER JOIN Plage P on P.id::integer = T.plage_id::integer
-        WHERE T.date = getDipsoTutorat.date
-        AND P.debut = getDipsoTutorat.debut
-        AND A.numero = getDipsoTutorat.app
-        AND S.code = getDipsoTutorat.session;
+        WHERE T.date = getDispoTutorat.date
+        AND A.numero = getDispoTutorat.app
+        AND S.code = getDispoTutorat.session;
+    CREATE TEMP TABLE listeTutorat (idTuto INT) ON COMMIT DROP;
+    INSERT INTO listeTutorat SELECT T.id FROM Tutorat T
+        INNER JOIN APP A2 on A2.id = T.APP_id
+        INNER JOIN Session S2 on S2.code = A2.session_code
+        WHERE t.date = getDispoTutorat.date
+        AND A2.numero = getDispoTutorat.app
+        AND S2.code = getDispoTutorat.session;
+    --NbTutorat := SELECT COUNT(*);
+    --nbMax := max()
     RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
 $$
@@ -427,7 +444,7 @@ CREATE FUNCTION getListTuto
 RETURNS TABLE
 (
     id INT,
-    date TIMESTAMPTZ,
+    date TIMESTAMP,
     plage_id INT
 )
 AS
@@ -447,8 +464,7 @@ CREATE FUNCTION makeEchange
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
     app VARCHAR(8),
-    session VARCHAR(3),
-    dateTuto DATE
+    session VARCHAR(3)
 )
 RETURNS
     BOOLEAN
@@ -462,26 +478,58 @@ BEGIN
         INNER JOIN Session S on S.code = A.session_code
         WHERE TU.cip = makeechange.cip1
         AND A.numero = makeechange.app
-        AND S.code = makeechange.session
-        AND T.date = makeechange.dateTuto);
+        AND S.code = makeechange.session);
     tutorat2 := (SELECT TU.tutorat_id FROM tutorat_utilisateur TU
         INNER JOIN Tutorat T ON TU.tutorat_id = T.id
         INNER JOIN APP A on T.APP_id = A.id
         INNER JOIN Session S on S.code = A.session_code
         WHERE TU.cip = makeechange.cip2
         AND A.numero = makeechange.app
-        AND S.code = makeechange.session
-        AND T.date = makeechange.dateTuto);
+        AND S.code = makeechange.session);
+    DELETE FROM Tutorat_Utilisateur TU
+        WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
+        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechange.cip1 AND TU.tutorat_id = tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat1
         WHERE TU.cip = makeechange.cip2 AND TU.tutorat_id = tutorat2;
     INSERT INTO log (timestamp, message) VALUES (NOW(),format('Echange cip : %s , %s Tutorat : %s  , ' ||
-        '%s APP : %s Session : %s Date tutorat : %s', cip1, cip2, tutorat1, tutorat2, app, session, dateTuto));
+        '%s APP : %s Session : %s ', cip1, cip2, tutorat1, tutorat2, app, session));
     RETURN TRUE;
 end;$$ LANGUAGE 'plpgsql';
 
-CREATE FUNCTION createNotif
+CREATE FUNCTION checkInMatchMaking
 (
-
+    plageIDDemandeur INT,
+    plageIDReceveur INT
 )
+RETURNS TABLE
+(
+    cip VARCHAR(8)
+)
+AS $$
+BEGIN
+    RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
+        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION checkInDispo
+(
+    APP VARCHAR(8),
+    Session VARCHAR(3)
+)
+RETURNS TABLE
+(
+    cip VARCHAR(8)
+)
+AS $$
+BEGIN
+    RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
+        INNER JOIN tutorat t ON t.id = D.idtutorat
+        INNER JOIN APP A on A.id = t.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE A.numero = checkInDispo.APP
+        AND S.code = checkInDispo.Session;
+END;$$ LANGUAGE 'plpgsql';
+
