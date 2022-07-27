@@ -28,27 +28,16 @@ public class EchangeService {
             @PathParam("session") String session,
             @PathParam("idtutorat1") int idtutorat1,
             @PathParam("idtutorat2") int idtutorat2,
-            @PathParam("dateTuto") String dateTuto
+            @PathParam("dateTuto") Timestamp dateTuto
     )
     {
         Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
         if(valid.valid)
         {
             System.out.println("true");
-            System.out.println(echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2));
+            //System.out.println(echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2));
 
-            Echange echanges = echangeMapper.EchangeRapide(cip1, cip2, app, session, dateTuto);
-
-            if(echanges.valid)
-            {
-                System.out.println("Echange effectue");
-                return;
-            }
-            else
-            {
-                System.out.println("Erreur echange");
-                return;
-            }
+            echangeMapper.EchangeRapide(cip1, cip2, app, session, dateTuto);
         }
         else {
             System.out.println(valid.valid);
