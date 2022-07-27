@@ -192,7 +192,7 @@ $$
 BEGIN
         CASE WHEN EXISTS
             (
-                SELECT * FROM Utilisateur U WHERE U.cip = 'doyf1501'
+                SELECT * FROM Utilisateur U WHERE U.cip = validationCIP.cip
             )
             THEN RETURN TRUE;
             ELSE RETURN FALSE;
@@ -409,10 +409,10 @@ BEGIN
         INNER JOIN tutorat T ON t.id = DU.idtutorat
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
-        INNER JOIN Plage P on P.id = T.plage_id
+        INNER JOIN Plage P on P.id::integer = T.plage_id::integer
         WHERE T.date = getDipsoTutorat.date
         AND P.debut = getDipsoTutorat.debut
-        AND A.id = getDipsoTutorat.app
+        AND A.numero = getDipsoTutorat.app
         AND S.code = getDipsoTutorat.session;
     RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
@@ -481,3 +481,7 @@ BEGIN
     RETURN TRUE;
 end;$$ LANGUAGE 'plpgsql';
 
+CREATE FUNCTION createNotif
+(
+
+)
