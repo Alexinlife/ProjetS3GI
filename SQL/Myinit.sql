@@ -315,18 +315,15 @@ CREATE OR replace FUNCTION validationForEchangeRapide
     )
 AS
     $$BEGIN
-        RETURN QUERY SELECT
-    CASE WHEN validationCIP(validationForEchangeRapide.cip1)
+    RETURN QUERY SELECT
+    validationCIP(validationForEchangeRapide.cip1)
         AND validationCIP(validationForEchangeRapide.cip2)
         AND validationCour(validationForEchangeRapide.app, validationForEchangeRapide.session)
         AND validationTutorat(validationForEchangeRapide.idTutorat1)
         AND validationTutorat(validationForEchangeRapide.idTutorat2)
         AND validationCIPTutorat(validationForEchangeRapide.cip1, validationForEchangeRapide.idTutorat1)
         AND validationCIPTutorat(validationForEchangeRapide.cip2, validationForEchangeRapide.idTutorat2)
-        AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2
-        THEN valid is true
-        Else valid is false
-        END;
+        AND validationForEchangeRapide.cip1 != validationForEchangeRapide.cip2 as valid;
 end;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION getGroupeTutoratJour(
