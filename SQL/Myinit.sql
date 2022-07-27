@@ -111,6 +111,15 @@ CREATE TABLE Echange
     FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
 );
 
+CREATE TABLE matchmaking
+(
+    cip_receveur VARCHAR(8),
+    tutorat_receveur INT,
+    tutorat_souhaite  INT,
+    FOREIGN KEY (cip_receveur) REFERENCES Utilisateur (cip),
+    FOREIGN KEY (tutorat_receveur) REFERENCES Tutorat (id),
+    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
+);
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
 CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
@@ -389,9 +398,8 @@ AS
     LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION getDipsoTutorat(
+CREATE or replace FUNCTION getDispoTutorat(
     date DATE,
-    debut TIMESTAMP,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -402,6 +410,8 @@ RETURNS TABLE
 )
 AS
 $$
+    DECLARE NbTutorat INT;
+    DECLARE nbMAX INT;
 BEGIN
     CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
     INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
@@ -409,10 +419,18 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
         INNER JOIN Plage P on P.id::integer = T.plage_id::integer
-        WHERE T.date = getDipsoTutorat.date
-        AND P.debut = getDipsoTutorat.debut
-        AND A.numero = getDipsoTutorat.app
-        AND S.code = getDipsoTutorat.session;
+        WHERE T.date = getDispoTutorat.date
+        AND A.numero = getDispoTutorat.app
+        AND S.code = getDispoTutorat.session;
+    CREATE TEMP TABLE listeTutorat (idTuto INT) ON COMMIT DROP;
+    INSERT INTO listeTutorat SELECT T.id FROM Tutorat T
+        INNER JOIN APP A2 on A2.id = T.APP_id
+        INNER JOIN Session S2 on S2.code = A2.session_code
+        WHERE t.date = getDispoTutorat.date
+        AND A2.numero = getDispoTutorat.app
+        AND S2.code = getDispoTutorat.session;
+    --NbTutorat := SELECT COUNT(*);
+    --nbMax := max()
     RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
 $$
@@ -479,3 +497,39 @@ BEGIN
         '%s APP : %s Session : %s ', cip1, cip2, tutorat1, tutorat2, app, session));
     RETURN TRUE;
 end;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION checkInMatchMaking
+(
+    plageIDDemandeur INT,
+    plageIDReceveur INT
+)
+RETURNS TABLE
+(
+    cip VARCHAR(8)
+)
+AS $$
+BEGIN
+    RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
+        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION checkInDispo
+(
+    APP VARCHAR(8),
+    Session VARCHAR(3)
+)
+RETURNS TABLE
+(
+    cip VARCHAR(8)
+)
+AS $$
+BEGIN
+    RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
+        INNER JOIN tutorat t ON t.id = D.idtutorat
+        INNER JOIN APP A on A.id = t.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE A.numero = checkInDispo.APP
+        AND S.code = checkInDispo.Session;
+END;$$ LANGUAGE 'plpgsql';
+
