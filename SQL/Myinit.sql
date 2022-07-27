@@ -516,8 +516,7 @@ END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION checkInDispo
 (
-    APP VARCHAR(8),
-    Session VARCHAR(3)
+    idTutorat INT
 )
 RETURNS TABLE
 (
@@ -526,10 +525,6 @@ RETURNS TABLE
 AS $$
 BEGIN
     RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
-        INNER JOIN tutorat t ON t.id = D.idtutorat
-        INNER JOIN APP A on A.id = t.APP_id
-        INNER JOIN Session S on S.code = A.session_code
-        WHERE A.numero = checkInDispo.APP
-        AND S.code = checkInDispo.Session;
+        WHERE D.idtutorat = checkInDispo.idTutorat;
 END;$$ LANGUAGE 'plpgsql';
 
