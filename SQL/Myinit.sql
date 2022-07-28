@@ -192,6 +192,36 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
+CREATE FUNCTION getHoraireUtilisateurExclu(
+    date timestamp,
+    app varchar(8),
+    session varchar(3),
+    cip VARCHAR(8)
+)
+    RETURNS TABLE (
+                    plage timestamp,
+                    plage_id int
+                  )
+AS
+$$
+BEGIN
+    RETURN QUERY SELECT
+                     P.debut,
+                     T.plage_id
+
+                 from tutorat T
+                    INNER JOIN app A on A.id = T.app_id
+                    INNER JOIN plage P on T.plage_id = P.id
+                    INNER JOIN session S on S.code = A.session_code
+                    INNER JOIN Tutorat_Utilisateur TU on T.id = TU.tutorat_id
+                 where Date(getHoraireUtilisateurExclu.date) = date(T.date)
+                 and getHoraireUtilisateurExclu.app = A.numero
+                 and getHoraireUtilisateurExclu.session = S.code
+                 AND getHoraireUtilisateurExclu.cip != TU.cip;
+END;
+$$
+    LANGUAGE 'plpgsql';
+
 CREATE FUNCTION validationCIP (
     cip VARCHAR(8)
 )
@@ -603,7 +633,7 @@ CREATE FUNCTION makeEchangeWithTutorat
     tutorat1 INT,
     tutorat2 INT
 )
-RETURN BOOLEAN
+RETURNS BOOLEAN
 AS $$
 BEGIN
     DELETE FROM Tutorat_Utilisateur TU
