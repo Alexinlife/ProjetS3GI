@@ -677,3 +677,39 @@ BEGIN
         , cip1, cip2, tutorat1, tutorat2));
     RETURN TRUE;
 END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION getInfoCIP2
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    idTutorat1 INT
+)
+RETURNS TABLE
+(
+    IdTutorat2 INT,
+    App VARCHAR(8),
+    Session VARCHAR(3)
+)
+AS $$
+    DECLARE vapp VARCHAR(8);
+    DECLARE vsession VARCHAR(3);
+BEGIN
+    vapp := (SELECT A.numero FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        WHERE TU.cip = getInfoCIP2.cip1
+        AND tu.tutorat_id = getInfoCIP2.IdTutorat1);
+    vsession := (SELECT S.code FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE TU.cip = getInfoCIP2.cip1
+        AND tu.tutorat_id = getInfoCIP2.IdTutorat1);
+    RETURN QUERY SELECT FROM Tutorat_Utilisateur TU2
+        INNER JOIN Tutorat T2 on T2.id = TU2.tutorat_id
+        INNER JOIN app a2 on T2.numero = a2.numero
+        INNER JOIN Session S2 on S2.code = a2.session_code
+        WHERE TU2.cip = getInfoCIP2.cip2
+        AND a2.numero = vapp
+        AND s2.code = vsession;
+END;$$ LANGUAGE 'plpgsql';
