@@ -1,13 +1,11 @@
 package ca.usherbrooke.fgen.api.service;
 
 import ca.usherbrooke.fgen.api.business.Notification;
-import ca.usherbrooke.fgen.api.persistence.MessageMapper;
 import ca.usherbrooke.fgen.api.persistence.NotificationMapper;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
 import java.util.List;
 
 @Path("/api")

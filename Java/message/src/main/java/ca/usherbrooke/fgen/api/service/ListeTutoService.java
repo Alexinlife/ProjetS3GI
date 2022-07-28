@@ -2,19 +2,14 @@ package ca.usherbrooke.fgen.api.service;
 
 import ca.usherbrooke.fgen.api.business.ListeTuto;
 import ca.usherbrooke.fgen.api.persistence.ListeTutoMapper;
-import org.jsoup.parser.Parser;
-
 
 import javax.inject.Inject;
-import javax.print.DocPrintJob;
-import javax.print.PrintService;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.sql.Time;
-import java.sql.Timestamp;
+
 import java.util.List;
-import java.awt.print.*;
-import java.util.stream.Collectors;
+
 
 
 @Path("/api")

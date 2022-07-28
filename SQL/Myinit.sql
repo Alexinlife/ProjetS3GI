@@ -111,6 +111,15 @@ CREATE TABLE Echange
     FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
 );
 
+CREATE TABLE matchmaking
+(
+    cip_receveur VARCHAR(8),
+    tutorat_receveur INT,
+    tutorat_souhaite  INT,
+    FOREIGN KEY (cip_receveur) REFERENCES Utilisateur (cip),
+    FOREIGN KEY (tutorat_receveur) REFERENCES Tutorat (id),
+    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
+);
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
 CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
@@ -179,6 +188,33 @@ BEGIN
                 INNER JOIN APP A on A.id = T.APP_id
                 INNER JOIN Session S on S.code = A.session_code
                 WHERE getHoraireUtilisateur.cip =U.cip;
+END;
+$$
+    LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION getHoraireUtilisateurExclu(
+    date timestamp,
+    app varchar(8),
+    session varchar(3)
+)
+    RETURNS TABLE (
+                    plage timestamp,
+                    plage_id int
+                  )
+AS
+$$
+BEGIN
+    RETURN QUERY SELECT
+                     P.debut,
+                     T.plage_id
+
+                 from tutorat T
+                    INNER JOIN app A on A.id = T.app_id
+                    INNER JOIN plage P on T.plage_id = P.id
+                    INNER JOIN session S on S.code = A.session_code
+                 where Date(getHoraireUtilisateurExclu.date) = date(T.date)
+                 and getHoraireUtilisateurExclu.app = A.numero
+                 and getHoraireUtilisateurExclu.session = S.code;
 END;
 $$
     LANGUAGE 'plpgsql';
@@ -359,7 +395,7 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE FUNCTION getNotif
+CREATE FUNCTION getEchange
     (
         cip VARCHAR(8)
     )
@@ -384,14 +420,13 @@ AS
                          E.tutorat_cible,
                          E.confirme
                          FROM echange E
-                        WHERE getNotif.cip =E.cible;
+                        WHERE getEchange.cip =E.cible;
     END;$$
     LANGUAGE 'plpgsql';
 
 
-CREATE FUNCTION getDipsoTutorat(
+CREATE or replace FUNCTION getDispoTutorat(
     date DATE,
-    debut TIMESTAMP,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -402,6 +437,10 @@ RETURNS TABLE
 )
 AS
 $$
+    DECLARE NbTutorat INT;
+    DECLARE nbMAX INT;
+    DECLARE cnt INT;
+    DECLARE nbPersonne
 BEGIN
     CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
     INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
@@ -409,10 +448,26 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
         INNER JOIN Plage P on P.id::integer = T.plage_id::integer
-        WHERE T.date = getDipsoTutorat.date
-        AND P.debut = getDipsoTutorat.debut
-        AND A.numero = getDipsoTutorat.app
-        AND S.code = getDipsoTutorat.session;
+        WHERE T.date = getDispoTutorat.date
+        AND A.numero = getDispoTutorat.app
+        AND S.code = getDispoTutorat.session;
+    CREATE TEMP TABLE listeTutorat (idTuto INT) ON COMMIT DROP;
+    INSERT INTO listeTutorat SELECT T.id FROM Tutorat T
+        INNER JOIN APP A2 on A2.id = T.APP_id
+        INNER JOIN Session S2 on S2.code = A2.session_code
+        WHERE t.date = getDispoTutorat.date
+        AND A2.numero = getDispoTutorat.app
+        AND S2.code = getDispoTutorat.session;
+    NbTutorat := (SELECT COUNT(*) FROM listeTutorat);
+    cnt := 0;
+    nbMax = 0;
+    FOR cnt IN 1..nbTutorat LOOP
+        nbPersonne :=
+        (
+        SELECT COUNT(*) FROM tutorat_utilisateur
+        )
+    END LOOP;
+    --nbMax := max()
     RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
 $$
@@ -479,3 +534,91 @@ BEGIN
         '%s APP : %s Session : %s ', cip1, cip2, tutorat1, tutorat2, app, session));
     RETURN TRUE;
 end;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION checkInMatchMaking
+(
+    plageIDDemandeur INT,
+    plageIDReceveur INT
+)
+RETURNS TABLE
+(
+    cip VARCHAR(8)
+)
+AS $$
+BEGIN
+    RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
+        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION checkInDispo
+(
+    idTutorat INT
+)
+    RETURNS TABLE
+            (
+                cip VARCHAR(8)
+            )
+AS $$
+BEGIN
+    RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
+                 WHERE D.idtutorat = checkInDispo.idTutorat;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION createMatchMaking
+(
+    cipReceveur VARCHAR(8),
+    tutoratReceveur INT,
+    tutoratSouhaite INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    INSERT INTO matchmaking(cip_receveur, tutorat_receveur, tutorat_souhaite)
+        VALUES
+        (
+            createMatchMaking.cipReceveur,
+            createMatchMaking.tutoratReceveur,
+            createMatchMaking.tutoratSouhaite
+        );
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION createEchange
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    CASE WHEN EXISTS
+    (
+        SELECT * FROM echange E
+            WHERE createEchange.demandeur = E.demandeur
+            AND createEchange.cible = E.cible
+            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
+            AND createEchange.tutorat_cible = E.tutorat_cible
+    )
+    THEN
+        UPDATE echange E SET E.confirme = createEchange.confirme
+            WHERE createEchange.demandeur = E.demandeur
+            AND createEchange.cible = E.cible
+            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
+            AND createEchange.tutorat_cible = E.tutorat_cible
+    ELSE
+        INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
+            VALUES
+            (
+                now(),
+                createEchange.demandeur,
+                createEchange.cible,
+                createEchange.tutorat_demandeur
+                createEchange.tutorat_cible
+                createEchange.confirme
+            );
+    END CASE;
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
