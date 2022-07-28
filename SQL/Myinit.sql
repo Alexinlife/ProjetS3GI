@@ -428,8 +428,9 @@ AS
     LANGUAGE 'plpgsql';
 
 
-CREATE or replace FUNCTION getDispoTutorat(
-    date DATE,
+CREATE FUNCTION getDispoTutorat
+(
+    _date DATE,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -451,27 +452,9 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
         INNER JOIN Plage P on P.id::integer = T.plage_id::integer
-        WHERE T.date = getDispoTutorat.date
+        WHERE T.date = getDispoTutorat._date
         AND A.numero = getDispoTutorat.app
         AND S.code = getDispoTutorat.session;
-    CREATE TEMP TABLE listeTutorat (idTuto INT) ON COMMIT DROP;
-    INSERT INTO listeTutorat SELECT T.id FROM Tutorat T
-        INNER JOIN APP A2 on A2.id = T.APP_id
-        INNER JOIN Session S2 on S2.code = A2.session_code
-        WHERE t.date = getDispoTutorat.date
-        AND A2.numero = getDispoTutorat.app
-        AND S2.code = getDispoTutorat.session;
-    NbTutorat := (SELECT COUNT(*) FROM listeTutorat);
-    cnt := 0;
-    nbMax = 0;
-    FOR cnt IN 1..nbTutorat LOOP
-        nbPersonne :=
-        (
-        SELECT COUNT(*) FROM tutorat_utilisateur
-        )
-    END LOOP;
-    --nbMax := max()
-    RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
 $$
     LANGUAGE 'plpgsql';
