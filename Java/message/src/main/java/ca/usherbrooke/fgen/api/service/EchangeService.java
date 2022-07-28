@@ -43,25 +43,30 @@ public class EchangeService {
     }
 
     @GET
-    @Path("matchmaking/{cip1}/{cip2}/{app}/{session}/{idtutorat1}/{idtutorat2}/{etat}")
+    @Path("matchmaking/{cip}/{idtutorat1}/{idtutorat2}")
     public void Matchmaking(
-            @PathParam("cip1") String cip1,
-            @PathParam("cip2") String cip2,
-            @PathParam("app") String app,
-            @PathParam("session") String session,
+            @PathParam("cip") String cip,
             @PathParam("idtutorat1") int idtutorat1,
             @PathParam("idtutorat2") int idtutorat2
     )
     {
-        Echange valid = echangeMapper.getValidation(cip1, cip2, app, session, idtutorat1, idtutorat2);
-        if(valid.valid)
+        System.out.println("ALLO");
+        Echange valid = echangeMapper.checkMatchmaking(idtutorat1,idtutorat2);
+        System.out.println(valid.cip1);
+        /*if(valid.cip1 != null)
         {
-            Echange echange = echangeMapper.Matchmaking();
-            return;
+            echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
         }
         else {
-            System.out.println("Erreur");
-            return;
+            valid = echangeMapper.checkDispo(idtutorat2);
+
         }
+        if(valid.cip1 != null){
+            echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
+        }
+        else{
+            echangeMapper.createMatch(cip,idtutorat1,idtutorat2);
+        }*/
+        return;
     }
 }
