@@ -536,9 +536,9 @@ BEGIN
         WHERE TU.cip = makeechange.cip2
         AND A.numero = makeechange.app
         AND S.code = makeechange.session);
-    DELETE FROM Tutorat_Utilisateur TU
-        WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
-        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    DELETE FROM disponibilité_utilisateur DU
+        WHERE (DU.idtutorat = tutorat1 AND DU.cip = makeechange.cip1)
+        OR (DU.idTutorat =tutorat2 AND DU.cip = makeEchange.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechange.cip1 AND TU.tutorat_id = tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat1
@@ -679,9 +679,9 @@ CREATE FUNCTION makeEchangeWithTutorat
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    DELETE FROM Tutorat_Utilisateur TU
-    WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
-        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    DELETE FROM disponibilité_utilisateur DU
+    WHERE (DU.idTutorat = tutorat1 AND DU.cip = makeechangeWithTutorat.cip1)
+        OR (DU.idTutorat =tutorat2 AND DU.cip = makeechangeWithTutorat.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechangeWithTutorat.cip1 AND TU.tutorat_id = makeechangeWithTutorat.tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = makeechangeWithTutorat.tutorat1

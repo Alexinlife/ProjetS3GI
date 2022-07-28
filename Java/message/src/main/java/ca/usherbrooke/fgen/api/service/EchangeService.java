@@ -53,20 +53,21 @@ public class EchangeService {
         System.out.println("ALLO");
         Echange valid = echangeMapper.checkMatchmaking(idtutorat1,idtutorat2);
         System.out.println(valid.cip1);
-        /*if(valid.cip1 != null)
+        if(valid != null)
         {
+            System.out.println("ALLO");
             echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
         }
         else {
             valid = echangeMapper.checkDispo(idtutorat2);
 
         }
-        if(valid.cip1 != null){
+        if(valid != null){
             echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
         }
         else{
             echangeMapper.createMatch(cip,idtutorat1,idtutorat2);
-        }*/
+        }
         return;
     }
 }
