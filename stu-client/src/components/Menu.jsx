@@ -10,13 +10,13 @@ class Menu extends React.Component {
             <Box>
                 <Typography className="UdS-title" variant="h6">Sélectionnez une option :</Typography>
                 <Box className="menu-box" sx={{ width: '100%', maxWidth: 360 }}>
-                    <Link className="UdS-link" to={`/availabilities`}>
+                    <Link className="UdS-link" to={`/request-change`}>
                         <Button className="UdS-btn" variant="contained" component="span">
                             Je veux échanger
                         </Button>
                     </Link>
-                    <Link className="UdS-link" to={`/availabilities`}>
-                        <Button className="UdS-btn" variant="contained" component="span">
+                    <Link className="UdS-link" disabled /* to={`/availabilities`} */ to={`/`}>
+                        <Button className="UdS-btn" disabled variant="contained" component="span">
                             Je suis disponible
                         </Button>
                     </Link>
