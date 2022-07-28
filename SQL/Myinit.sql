@@ -192,10 +192,11 @@ END;
 $$
     LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION getHoraireUtilisateurExclu(
+CREATE FUNCTION getHoraireUtilisateurExclu(
     date timestamp,
     app varchar(8),
-    session varchar(3)
+    session varchar(3),
+    cip VARCHAR(8)
 )
     RETURNS TABLE (
                     plage timestamp,
@@ -212,9 +213,11 @@ BEGIN
                     INNER JOIN app A on A.id = T.app_id
                     INNER JOIN plage P on T.plage_id = P.id
                     INNER JOIN session S on S.code = A.session_code
+                    INNER JOIN Tutorat_Utilisateur TU on T.id = TU.tutorat_id
                  where Date(getHoraireUtilisateurExclu.date) = date(T.date)
                  and getHoraireUtilisateurExclu.app = A.numero
-                 and getHoraireUtilisateurExclu.session = S.code;
+                 and getHoraireUtilisateurExclu.session = S.code
+                 AND getHoraireUtilisateurExclu.cip != TU.cip;
 END;
 $$
     LANGUAGE 'plpgsql';
@@ -583,6 +586,49 @@ BEGIN
         );
 END;$$ LANGUAGE 'plpgsql';
 
+CREATE FUNCTION updateEchangeForCreation
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE echange E SET E.confirme = updateEchangeForCreation.confirme
+            WHERE updateEchangeForCreation.demandeur = E.demandeur
+            AND updateEchangeForCreation.cible = E.cible
+            AND updateEchangeForCreation.tutorat_demandeur = E.tutorat_demandeur
+            AND updateEchangeForCreation.tutorat_cible = E.tutorat_cible;
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION insertEchangeForCreation
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
+           VALUES
+           (
+               now(),
+               InsertEchangeForCreation.demandeur,
+               InsertEchangeForCreation.cible,
+               InsertEchangeForCreation.tutorat_demandeur,
+               InsertEchangeForCreation.tutorat_cible,
+               InsertEchangeForCreation.confirme
+           );
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
 CREATE FUNCTION createEchange
 (
     demandeur VARCHAR(8),
@@ -594,7 +640,7 @@ CREATE FUNCTION createEchange
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    CASE WHEN EXISTS
+    SELECT CASE WHEN EXISTS
     (
         SELECT * FROM echange E
             WHERE createEchange.demandeur = E.demandeur
@@ -603,22 +649,67 @@ BEGIN
             AND createEchange.tutorat_cible = E.tutorat_cible
     )
     THEN
-        UPDATE echange E SET E.confirme = createEchange.confirme
-            WHERE createEchange.demandeur = E.demandeur
-            AND createEchange.cible = E.cible
-            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
-            AND createEchange.tutorat_cible = E.tutorat_cible
+        (updateEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
     ELSE
-        INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
-            VALUES
-            (
-                now(),
-                createEchange.demandeur,
-                createEchange.cible,
-                createEchange.tutorat_demandeur
-                createEchange.tutorat_cible
-                createEchange.confirme
-            );
-    END CASE;
+       (insertEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
+end;
     RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION makeEchangeWithTutorat
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    tutorat1 INT,
+    tutorat2 INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    DELETE FROM Tutorat_Utilisateur TU
+    WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
+        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
+        WHERE TU.cip = makeechangeWithTutorat.cip1 AND TU.tutorat_id = makeechangeWithTutorat.tutorat1;
+    UPDATE tutorat_utilisateur TU SET tutorat_id = makeechangeWithTutorat.tutorat1
+        WHERE TU.cip = makeechangeWithTutorat.cip2 AND TU.tutorat_id = makeechangeWithTutorat.tutorat2;
+    INSERT INTO log (timestamp, message) VALUES (NOW(),format('Echange cip : %s , %s Tutorat : %s '
+        , cip1, cip2, tutorat1, tutorat2));
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION getInfoCIP2
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    idTutorat1 INT
+)
+RETURNS TABLE
+(
+    IdTutorat2 INT,
+    App VARCHAR(8),
+    Session VARCHAR(3)
+)
+AS $$
+    DECLARE vapp VARCHAR(8);
+    DECLARE vsession VARCHAR(3);
+BEGIN
+    vapp := (SELECT A.numero FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        WHERE TU.cip = getInfoCIP2.cip1
+        AND tu.tutorat_id = getInfoCIP2.IdTutorat1);
+    vsession := (SELECT S.code FROM tutorat_utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE TU.cip = getInfoCIP2.cip1
+        AND tu.tutorat_id = getInfoCIP2.IdTutorat1);
+    RETURN QUERY SELECT FROM Tutorat_Utilisateur TU2
+        INNER JOIN Tutorat T2 on T2.id = TU2.tutorat_id
+        INNER JOIN app a2 on T2.numero = a2.numero
+        INNER JOIN Session S2 on S2.code = a2.session_code
+        WHERE TU2.cip = getInfoCIP2.cip2
+        AND a2.numero = vapp
+        AND s2.code = vsession;
 END;$$ LANGUAGE 'plpgsql';
