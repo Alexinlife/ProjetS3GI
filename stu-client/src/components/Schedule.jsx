@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import '../css/UdS.css';
 import '../css/Schedule.css';
-import { Box, FormControl, ListItem, ListItemText, Radio, RadioGroup, Typography } from '@mui/material/';
+import { Box, ListItem, ListItemText, Radio, RadioGroup, Typography } from '@mui/material/';
 
 class Schedule extends React.Component {
   state = {
@@ -12,11 +12,12 @@ class Schedule extends React.Component {
 
   componentDidMount() {
     this.getSchedule();
+    localStorage.removeItem("selected_tutorat");
   }
 
   async getSchedule() {
     try {
-      const scheduleResponse = await axios.get('http://localhost:8089/tutorats/gethoraire');
+      const scheduleResponse = await axios.get('http://localhost:8089/api/gethoraire/' + localStorage.getItem("cip"));
       console.log(scheduleResponse);
       this.setState({
         schedule: scheduleResponse.data,
@@ -37,28 +38,33 @@ class Schedule extends React.Component {
     return (
       <Box>
         <Typography className="UdS-title" variant="h6">Vos tutorats à venir :</Typography>
-        <FormControl>
-          <RadioGroup
-            aria-labelledby="radio-schedule"
-            name="radio-schedule"
-            value={this.state.selected}
-            onChange={handleChange}
-          >
-            {this.state.schedule.map((item) => (
+        <RadioGroup
+          name="radio-schedule"
+          value={this.state.selected}
+          onChange={handleChange}
+        >
+          {
+            this.state.schedule.length === 0 ?
               <ListItem className="UdS-item">
-                <Radio value={item.idTutorat}
-                  sx={{
-                    color: "#ffffff",
-                    '&.Mui-checked': {
-                      color: "#4D8406",
-                    },
-                  }}
-                ></Radio>
-                <ListItemText primary={"Tutorat" + item.numeroTutorat} secondary={item.numeroAPP + " | " + item.dateTutorat} />
+                <ListItemText primary="Aucun tutorat à venir" secondary="Contactez le coordonateur pour plus d'information" />
               </ListItem>
-            ))}
-          </RadioGroup>
-        </FormControl>
+              :
+              this.state.schedule.map((item) => (
+                <ListItem className="UdS-item" key={item.idTutorat}>
+                  <Radio
+                    value={item.idTutorat}
+                    sx={{
+                      color: "#ffffff",
+                      '&.Mui-checked': {
+                        color: "#4D8406",
+                      },
+                    }}
+                  />
+                  <ListItemText primary={"Tutorat" + item.numeroTutorat} secondary={item.numeroAPP + " | " + item.dateTutorat} />
+                </ListItem>
+              ))
+          }
+        </RadioGroup>
       </Box>
     );
   }
