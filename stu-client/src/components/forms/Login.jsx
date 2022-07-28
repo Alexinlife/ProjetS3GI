@@ -1,5 +1,5 @@
 import React from 'react';
-import * as sessionService from '../../services/sessionService.jsx';
+// import * as sessionService from '../../services/sessionService.jsx';
 import '../../css/UdS.css';
 import { withFormik } from 'formik';
 import * as yup from 'yup';
@@ -9,6 +9,7 @@ const validation = {
     cip: yup
         .string()
         .required("Le champ CIP est obligatoire")
+        .matches(/^[a-zA-Z]+[0-9]+$/, "Le format du CIP est incorrect")
         .min(8, "Le champ CIP doit contenir exactement 8 caractères")
         .max(8, "Le champ CIP doit contenir exactement 8 caractères"),
     password: yup
@@ -124,11 +125,11 @@ const Login = withFormik({
     validationSchema: yup.object().shape(validation),
     handleSubmit: async (values, { setSubmitting }) => {
         try {
-            const response = await sessionService.authentificate(values.cip, values.password);
+            /* const response = await sessionService.authentificate(values.cip, values.password);
             const sessionToken = response.data.session_token;
             const expToken = response.data.exp_token;
             localStorage.setItem("session_token", sessionToken);
-            localStorage.setItem("exp_token", expToken);
+            localStorage.setItem("exp_token", expToken); */
             localStorage.setItem("cip", String(values.cip).toLowerCase());
             setSubmitting(false);
             window.location = "/";
