@@ -4,7 +4,6 @@ import '../css/NavBar.css';
 // Composants Material-UI
 import { AppBar, Box, IconButton, Toolbar, Typography } from '@mui/material';
 // Icônes
-import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import BellIcon from '@mui/icons-material/Notifications';
 import Notifications from './Notifications';
@@ -38,9 +37,8 @@ export default class NavBar extends React.Component {
               <span className="nav-title-sm">STU</span>
             </Typography>
             {/* Compte */}
-            <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>{localStorage.getItem("session_token") ? <span>{localStorage.getItem("cip")}</span> : <span>Déconnecté</span>}</Typography>
-            <PersonIcon />
-            {localStorage.getItem("session_token") ?
+            <Typography edge="end" className="nav-text" sx={{ flexGrow: 1 }}>{ /* localStorage.getItem("session_token") */ localStorage.getItem("cip") ? <span>{localStorage.getItem("cip")}</span> : <span>Déconnecté</span> }</Typography>
+            { /* localStorage.getItem("session_token") */ localStorage.getItem("cip") ?
               <IconButton edge="end" className="nav-btn" color="inherit" aria-label="logout" onClick={sessionService.logout}>
                 <LogoutIcon />
               </IconButton>
