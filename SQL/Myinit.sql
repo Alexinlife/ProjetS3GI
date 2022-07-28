@@ -586,6 +586,49 @@ BEGIN
         );
 END;$$ LANGUAGE 'plpgsql';
 
+CREATE FUNCTION updateEchangeForCreation
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE echange E SET E.confirme = updateEchangeForCreation.confirme
+            WHERE updateEchangeForCreation.demandeur = E.demandeur
+            AND updateEchangeForCreation.cible = E.cible
+            AND updateEchangeForCreation.tutorat_demandeur = E.tutorat_demandeur
+            AND updateEchangeForCreation.tutorat_cible = E.tutorat_cible;
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION insertEchangeForCreation
+(
+    demandeur VARCHAR(8),
+    cible VARCHAR(8),
+    tutorat_demandeur INT,
+    tutorat_cible INT,
+    confirme INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
+           VALUES
+           (
+               now(),
+               InsertEchangeForCreation.demandeur,
+               InsertEchangeForCreation.cible,
+               InsertEchangeForCreation.tutorat_demandeur,
+               InsertEchangeForCreation.tutorat_cible,
+               InsertEchangeForCreation.confirme
+           );
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
+
 CREATE FUNCTION createEchange
 (
     demandeur VARCHAR(8),
@@ -597,7 +640,7 @@ CREATE FUNCTION createEchange
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    CASE WHEN EXISTS
+    SELECT CASE WHEN EXISTS
     (
         SELECT * FROM echange E
             WHERE createEchange.demandeur = E.demandeur
@@ -606,23 +649,10 @@ BEGIN
             AND createEchange.tutorat_cible = E.tutorat_cible
     )
     THEN
-        UPDATE echange E SET E.confirme = createEchange.confirme
-            WHERE createEchange.demandeur = E.demandeur
-            AND createEchange.cible = E.cible
-            AND createEchange.tutorat_demandeur = E.tutorat_demandeur
-            AND createEchange.tutorat_cible = E.tutorat_cible
+        (updateEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
     ELSE
-        INSERT INTO echange (timestamp, demandeur, cible, tutorat_demandeur, tutorat_cible, confirme)
-            VALUES
-            (
-                now(),
-                createEchange.demandeur,
-                createEchange.cible,
-                createEchange.tutorat_demandeur
-                createEchange.tutorat_cible
-                createEchange.confirme
-            );
-    END CASE;
+       (insertEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
+end;
     RETURN TRUE;
 END;$$ LANGUAGE 'plpgsql';
 
