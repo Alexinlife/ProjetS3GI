@@ -595,3 +595,25 @@ BEGIN
     END CASE;
     RETURN TRUE;
 END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION makeEchangeWithTutorat
+(
+    cip1 VARCHAR(8),
+    cip2 VARCHAR(8),
+    tutorat1 INT,
+    tutorat2 INT
+)
+RETURN BOOLEAN
+AS $$
+BEGIN
+    DELETE FROM Tutorat_Utilisateur TU
+    WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
+        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
+        WHERE TU.cip = makeechangeWithTutorat.cip1 AND TU.tutorat_id = makeechangeWithTutorat.tutorat1;
+    UPDATE tutorat_utilisateur TU SET tutorat_id = makeechangeWithTutorat.tutorat1
+        WHERE TU.cip = makeechangeWithTutorat.cip2 AND TU.tutorat_id = makeechangeWithTutorat.tutorat2;
+    INSERT INTO log (timestamp, message) VALUES (NOW(),format('Echange cip : %s , %s Tutorat : %s '
+        , cip1, cip2, tutorat1, tutorat2));
+    RETURN TRUE;
+END;$$ LANGUAGE 'plpgsql';
