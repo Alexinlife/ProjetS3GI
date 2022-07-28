@@ -13,6 +13,7 @@ import java.util.List;
 public interface EchangeMapper {
 
     Echange getValidation(String cip1, String cip2, String app, String session, int idtutorat1, int idtutorat2);
+    Echange getInfoCip2(String cip1, String cip2, int idTutorat1);
     Echange EchangeRapide(String cip1, String cip2, String app, String session);
     Echange Matchmaking();
 }
