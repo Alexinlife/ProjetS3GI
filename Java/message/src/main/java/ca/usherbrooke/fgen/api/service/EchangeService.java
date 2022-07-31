@@ -21,20 +21,20 @@ public class EchangeService {
     EchangeMapper echangeMapper;
 
     @GET
-    @Path("echange-rapide/{cip}/{cip2}/{idtutorat1}")
+    @Path("echange-rapide/{cip1}/{cip2}/{idtutorat1}")
     public void EchangeRapide(
-            @PathParam("cip") String cip1,
+            @PathParam("cip1") String cip1,
             @PathParam("cip2") String cip2,
             @PathParam("idtutorat1") int idtutorat1
     )
     {
         Echange infoCip2 = echangeMapper.getInfoCip2(cip1, cip2, idtutorat1);
 
-        Echange valid = echangeMapper.getValidation(cip1, cip2, infoCip2.app, infoCip2.session, idtutorat1, infoCip2.idtutorat2);
+        Echange valid = echangeMapper.getValidation(cip1, cip2, infoCip2.App, infoCip2.Session, idtutorat1, infoCip2.IdTutorat2);
         if(valid.valid)
         {
             System.out.println("true");
-            echangeMapper.EchangeRapide(cip1, cip2, infoCip2.app, infoCip2.session);
+            echangeMapper.EchangeRapide(cip1, cip2, infoCip2.App, infoCip2.Session);
         }
         else {
             System.out.println(valid.valid);
