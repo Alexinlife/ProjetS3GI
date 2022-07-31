@@ -15,5 +15,8 @@ public interface EchangeMapper {
     Echange getValidation(String cip1, String cip2, String app, String session, int idtutorat1, int idtutorat2);
     Echange getInfoCip2(String cip1, String cip2, int idTutorat1);
     Echange EchangeRapide(String cip1, String cip2, String app, String session);
-    Echange Matchmaking();
+    Echange checkMatchmaking(int idTutorat, int idTutorat2);
+    Echange checkDispo(int idTutorat);
+    Echange createMatch(String cip, int idTutorat, int idTutorat2);
+    Echange echangeMatch(String cip1, String cip2, int idTutorat, int idTutorat2);
 }

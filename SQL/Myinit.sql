@@ -70,7 +70,7 @@ CREATE TABLE Tutorat
 
 CREATE TABLE Disponibilité_Utilisateur
 (
-    cip CHAR(8) NOT NULL,
+    cip VARCHAR(8) NOT NULL,
     idTutorat INT NOT NULL,
     PRIMARY KEY (cip, idtutorat),
     FOREIGN KEY (cip) REFERENCES Utilisateur(cip),
@@ -109,6 +109,16 @@ CREATE TABLE Echange
     FOREIGN KEY (tutorat_cible) REFERENCES Tutorat(id),
     FOREIGN KEY (demandeur) REFERENCES Utilisateur(cip),
     FOREIGN KEY (cible) REFERENCES Utilisateur(cip)
+);
+CREATE TABLE matchmaking
+(
+    cip_demandeur     VARCHAR(8),
+    tutorat_demandeur int,
+    tutorat_souhaite  int,
+
+    FOREIGN KEY (cip_demandeur) REFERENCES Utilisateur (cip),
+    FOREIGN KEY (tutorat_demandeur) REFERENCES Tutorat (id),
+    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
 );
 
 CREATE TABLE matchmaking
@@ -526,9 +536,9 @@ BEGIN
         WHERE TU.cip = makeechange.cip2
         AND A.numero = makeechange.app
         AND S.code = makeechange.session);
-    DELETE FROM Tutorat_Utilisateur TU
-        WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
-        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    DELETE FROM disponibilité_utilisateur DU
+        WHERE (DU.idtutorat = tutorat1 AND DU.cip = makeechange.cip1)
+        OR (DU.idTutorat =tutorat2 AND DU.cip = makeEchange.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechange.cip1 AND TU.tutorat_id = tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat1
@@ -545,13 +555,14 @@ CREATE FUNCTION checkInMatchMaking
 )
 RETURNS TABLE
 (
-    cip VARCHAR(8)
+    cip1 VARCHAR(8)
 )
 AS $$
 BEGIN
-    RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
-        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
-        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+    RETURN QUERY SELECT M.cip_demandeur FROM matchmaking M
+        WHERE M.tutorat_demandeur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur
+        LIMIT 1;
 END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION checkInDispo
@@ -559,13 +570,14 @@ CREATE FUNCTION checkInDispo
     idTutorat INT
 )
     RETURNS TABLE
-            (
-                cip VARCHAR(8)
-            )
+    (
+        cip1 VARCHAR(8)
+    )
 AS $$
 BEGIN
     RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
-                 WHERE D.idtutorat = checkInDispo.idTutorat;
+                 WHERE D.idtutorat = checkInDispo.idTutorat
+                LIMIT 1;
 END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION createMatchMaking
@@ -577,13 +589,14 @@ CREATE FUNCTION createMatchMaking
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    INSERT INTO matchmaking(cip_receveur, tutorat_receveur, tutorat_souhaite)
+    INSERT INTO matchmaking(cip_demandeur, tutorat_demandeur, tutorat_souhaite)
         VALUES
         (
             createMatchMaking.cipReceveur,
             createMatchMaking.tutoratReceveur,
             createMatchMaking.tutoratSouhaite
         );
+    RETURN true;
 END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION updateEchangeForCreation
@@ -666,9 +679,9 @@ CREATE FUNCTION makeEchangeWithTutorat
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    DELETE FROM Tutorat_Utilisateur TU
-    WHERE (TU.tutorat_id = tutorat1 AND TU.cip = makeechange.cip1)
-        OR (TU.tutorat_id =tutorat2 AND TU.cip = makeEchange.cip2);
+    DELETE FROM disponibilité_utilisateur DU
+    WHERE (DU.idTutorat = tutorat1 AND DU.cip = makeechangeWithTutorat.cip1)
+        OR (DU.idTutorat =tutorat2 AND DU.cip = makeechangeWithTutorat.cip2);
     UPDATE tutorat_utilisateur TU SET tutorat_id = tutorat2
         WHERE TU.cip = makeechangeWithTutorat.cip1 AND TU.tutorat_id = makeechangeWithTutorat.tutorat1;
     UPDATE tutorat_utilisateur TU SET tutorat_id = makeechangeWithTutorat.tutorat1
