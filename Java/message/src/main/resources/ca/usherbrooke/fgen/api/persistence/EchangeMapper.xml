@@ -16,4 +16,9 @@
     <select id="Matchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
 
     </select>
+
+    <select id="getInfoCip2" resultType="ca.usherbrooke.fgen.api.business.Echange">
+        select idtutorat2, session, app
+        from getinfocip2(#{arg0},#{arg1},#{arg2})
+    </select>
 </mapper>
