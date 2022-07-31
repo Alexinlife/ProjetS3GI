@@ -13,12 +13,27 @@
     select makeechange(#{arg0},#{arg1},#{arg2},#{arg3})
     </select>
 
-    <select id="Matchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
+    <select id="checkMatchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
+    SELECT cip1
+    FROM checkInMatchMaking(#{arg0},#{arg1})
+    </select>
 
+    <select id="checkDispo" resultType="ca.usherbrooke.fgen.api.business.Echange">
+        SELECT cip1
+        FROM checkInDispo(#{arg0})
+    </select>
+
+    <select id="createMatch" resultType="ca.usherbrooke.fgen.api.business.Echange">
+        SELECT createMatchMaking(#{arg0},#{arg1},#{arg2})
+    </select>
+
+    <select id="echangeMatch" resultType="ca.usherbrooke.fgen.api.business.Echange">
+        SELECT makeEchangeWithTutorat(#{arg0},#{arg1},#{arg2},#{arg3})
     </select>
 
     <select id="getInfoCip2" resultType="ca.usherbrooke.fgen.api.business.Echange">
         select idtutorat2, session, app
         from getinfocip2(#{arg0},#{arg1},#{arg2})
     </select>
+
 </mapper>
