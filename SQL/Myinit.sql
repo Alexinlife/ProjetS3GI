@@ -555,7 +555,7 @@ CREATE FUNCTION checkInMatchMaking
 )
 RETURNS TABLE
 (
-    cip1 VARCHAR(8)
+    cip VARCHAR(8)
 )
 AS $$
 BEGIN
@@ -571,7 +571,7 @@ CREATE FUNCTION checkInDispo
 )
     RETURNS TABLE
     (
-        cip1 VARCHAR(8)
+        cip VARCHAR(8)
     )
 AS $$
 BEGIN

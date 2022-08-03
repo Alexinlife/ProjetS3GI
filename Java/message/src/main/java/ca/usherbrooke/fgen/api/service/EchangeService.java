@@ -2,6 +2,7 @@ package ca.usherbrooke.fgen.api.service;
 
 import ca.usherbrooke.fgen.api.business.Echange;
 import ca.usherbrooke.fgen.api.persistence.EchangeMapper;
+import ca.usherbrooke.fgen.api.business.infoMatchmake;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -43,30 +44,31 @@ public class EchangeService {
     }
 
     @GET
-    @Path("matchmaking/{cip}/{idtutorat1}/{idtutorat2}")
+    @Path("matchmaking/{cip}/{idtutorat1}/{plageidDemander}")
     public void Matchmaking(
             @PathParam("cip") String cip,
             @PathParam("idtutorat1") int idtutorat1,
-            @PathParam("idtutorat2") int idtutorat2
+            @PathParam("plageidDemander") int plageDemander
     )
     {
+        Echange infoTuto = echangeMapper.checkMatchmaking(idtutorat1,idtutorat1);
         System.out.println("ALLO");
-        Echange valid = echangeMapper.checkMatchmaking(idtutorat1,idtutorat2);
-        System.out.println(valid.cip1);
+        Echange valid = echangeMapper.checkMatchmaking(idtutorat1,infoTuto.IdTutorat2);
+        System.out.println(valid.cip);
         if(valid != null)
         {
             System.out.println("ALLO");
-            echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
+            echangeMapper.echangeMatch(cip, valid.cip, idtutorat1,infoTuto.IdTutorat2);
         }
         else {
-            valid = echangeMapper.checkDispo(idtutorat2);
+            valid = echangeMapper.checkDispo(infoTuto.IdTutorat2);
 
         }
         if(valid != null){
-            echangeMapper.echangeMatch(cip, valid.cip1, idtutorat1,idtutorat2);
+            echangeMapper.echangeMatch(cip, valid.cip, idtutorat1,infoTuto.IdTutorat2);
         }
         else{
-            echangeMapper.createMatch(cip,idtutorat1,idtutorat2);
+            echangeMapper.createMatch(cip,idtutorat1,infoTuto.IdTutorat2);
         }
         return;
     }

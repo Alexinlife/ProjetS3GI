@@ -14,7 +14,7 @@
     </select>
 
     <select id="checkMatchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
-    SELECT cip1
+    SELECT cip
     FROM checkInMatchMaking(#{arg0},#{arg1})
     </select>
 
