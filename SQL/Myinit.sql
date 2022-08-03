@@ -349,7 +349,7 @@ END
 $$
     LANGUAGE 'plpgsql';
 
-CREATE OR replace FUNCTION validationForEchangeRapide
+CREATE FUNCTION validationForEchangeRapide
 (
     cip1 VARCHAR(8),
     cip2 VARCHAR(8),
@@ -434,12 +434,12 @@ AS
                          E.confirme
                          FROM echange E
                         WHERE getEchange.cip =E.cible;
-    END;$$
-    LANGUAGE 'plpgsql';
+END;$$ LANGUAGE 'plpgsql';
 
 
-CREATE or replace FUNCTION getDispoTutorat(
-    date DATE,
+CREATE FUNCTION getDispoTutorat
+(
+    _date DATE,
     app VARCHAR(8),
     session VARCHAR(3)
 )
@@ -453,7 +453,7 @@ $$
     DECLARE NbTutorat INT;
     DECLARE nbMAX INT;
     DECLARE cnt INT;
-    DECLARE nbPersonne
+    DECLARE nbPersonne INT;
 BEGIN
     CREATE TEMP TABLE temporaire (cip VARCHAR(8),idTutorat INT, PRIMARY KEY (cip, idTutorat)) ON COMMIT DROP;
     INSERT INTO temporaire SELECT DU.cip, DU.idTutorat FROM disponibilité_utilisateur DU
@@ -461,27 +461,9 @@ BEGIN
         INNER JOIN APP A on A.id = T.APP_id
         INNER JOIN Session S on S.code = A.session_code
         INNER JOIN Plage P on P.id::integer = T.plage_id::integer
-        WHERE T.date = getDispoTutorat.date
+        WHERE T.date = getDispoTutorat._date
         AND A.numero = getDispoTutorat.app
         AND S.code = getDispoTutorat.session;
-    CREATE TEMP TABLE listeTutorat (idTuto INT) ON COMMIT DROP;
-    INSERT INTO listeTutorat SELECT T.id FROM Tutorat T
-        INNER JOIN APP A2 on A2.id = T.APP_id
-        INNER JOIN Session S2 on S2.code = A2.session_code
-        WHERE t.date = getDispoTutorat.date
-        AND A2.numero = getDispoTutorat.app
-        AND S2.code = getDispoTutorat.session;
-    NbTutorat := (SELECT COUNT(*) FROM listeTutorat);
-    cnt := 0;
-    nbMax = 0;
-    FOR cnt IN 1..nbTutorat LOOP
-        nbPersonne :=
-        (
-        SELECT COUNT(*) FROM tutorat_utilisateur
-        )
-    END LOOP;
-    --nbMax := max()
-    RETURN QUERY SELECT T.cip, T.idTutorat FROM temporaire T;
 END;
 $$
     LANGUAGE 'plpgsql';
@@ -559,10 +541,14 @@ RETURNS TABLE
 )
 AS $$
 BEGIN
-    RETURN QUERY SELECT M.cip_demandeur FROM matchmaking M
-        WHERE M.tutorat_demandeur = checkInMatchMaking.plageIDReceveur
-        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur
-        LIMIT 1;
+    IF (exists(SELECT M.cip_receveur FROM matchmaking M
+        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur))
+    THEN RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
+        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+    ELSE RETURN QUERY VALUES ('0');
+    END IF;
 END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION checkInDispo
@@ -575,9 +561,12 @@ CREATE FUNCTION checkInDispo
     )
 AS $$
 BEGIN
-    RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
-                 WHERE D.idtutorat = checkInDispo.idTutorat
-                LIMIT 1;
+    IF exists(SELECT D.cip FROM disponibilité_utilisateur D
+              WHERE D.idtutorat = checkInDispo.idTutorat)
+        THEN RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
+                          WHERE D.idtutorat = checkInDispo.idTutorat;
+        ELSE RETURN QUERY VALUES ('0');
+        END IF;
 END;$$ LANGUAGE 'plpgsql';
 
 CREATE FUNCTION createMatchMaking
