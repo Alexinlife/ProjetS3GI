@@ -113,12 +113,14 @@ CREATE TABLE Echange
 
 CREATE TABLE matchmaking
 (
+    id SERIAL,
     cip_receveur VARCHAR(8),
     tutorat_receveur INT,
     tutorat_souhaite  INT,
     FOREIGN KEY (cip_receveur) REFERENCES Utilisateur (cip),
     FOREIGN KEY (tutorat_receveur) REFERENCES Tutorat (id),
-    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
+    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id),
+    PRIMARY KEY (id)
 );
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
@@ -531,13 +533,16 @@ RETURNS TABLE
 )
 AS $$
 BEGIN
-    IF (exists(SELECT M.cip_receveur FROM matchmaking M
-        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
-        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur))
-    THEN RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
-        WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
-        AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
-    ELSE RETURN QUERY VALUES ('0');
+    IF (exists(
+        SELECT M.cip_receveur FROM matchmaking M
+            WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+            AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur))
+    THEN
+        RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
+            WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+            AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
+    ELSE
+        RETURN QUERY VALUES ('0');
     END IF;
 END;$$ LANGUAGE 'plpgsql';
 
@@ -640,9 +645,11 @@ BEGIN
             AND createEchange.tutorat_cible = E.tutorat_cible
     )
     THEN
-        (updateEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
+        (updateEchangeForCreation(demandeur, cible,
+            tutorat_demandeur, tutorat_cible, confirme))
     ELSE
-       (insertEchangeForCreation(demandeur, cible, tutorat_demandeur, tutorat_cible, confirme))
+       (insertEchangeForCreation(demandeur, cible,
+           tutorat_demandeur, tutorat_cible, confirme))
 end;
     RETURN TRUE;
 END;$$ LANGUAGE 'plpgsql';
@@ -703,4 +710,42 @@ BEGIN
         WHERE TU2.cip = getInfoCIP2.cip2
         AND a2.numero = vapp
         AND s2.code = vsession;
+END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION getInfoForMatchmaking
+(
+    cip VARCHAR(8),
+    idTuto1 INT,
+    idPlageVoulu INT
+)
+RETURNS TABLE
+(
+    idTuto2 INT
+)
+AS
+$$
+    DECLARE app VARCHAR(8);
+    DECLARE session VARCHAR(3);
+BEGIN
+    app := (SELECT A.numero FROM Tutorat_Utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        WHERE TU.cip = getInfoForMatchmaking.cip
+        AND tu.tutorat_id = getInfoForMatchmaking.idTuto1
+        LIMIT 1);
+    session := (SELECT S.code FROM Tutorat_Utilisateur TU
+        INNER JOIN Tutorat T on T.id = TU.tutorat_id
+        INNER JOIN APP A on A.id = T.APP_id
+        INNER JOIN Session S on S.code = A.session_code
+        WHERE TU.cip = getInfoForMatchmaking.cip
+        AND tu.tutorat_id = getInfoForMatchmaking.idTuto1
+        LIMIT 1);
+    RETURN QUERY SELECT p.id FROM Plage p
+        INNER JOIN Tutorat T2 on p.id = T2.plage_id
+        INNER JOIN APP A2 on A2.id = T2.APP_id
+        INNER JOIN Session S2 on S2.code = A2.session_code
+        WHERE P.id = getInfoForMatchmaking.idPlageVoulu
+        AND A2.numero = app
+        AND S2.code = session
+        LIMIT 1;
 END;$$ LANGUAGE 'plpgsql';
