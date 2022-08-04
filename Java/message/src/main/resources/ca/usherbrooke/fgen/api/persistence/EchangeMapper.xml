@@ -14,17 +14,17 @@
     </select>
 
     <select id="checkMatchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
-    SELECT cip1
+    SELECT cip
     FROM checkInMatchMaking(#{arg0},#{arg1})
     </select>
 
     <select id="getInfoCip2" resultType="ca.usherbrooke.fgen.api.business.Echange">
-        select idtutorat2, session, app
+        select idtutorat2, app, session
         from getinfocip2(#{arg0},#{arg1},#{arg2})
     </select>
 
     <select id="checkDispo" resultType="ca.usherbrooke.fgen.api.business.Echange">
-        SELECT cip1
+        SELECT cip
         FROM checkInDispo(#{arg0})
     </select>
 
