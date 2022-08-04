@@ -740,7 +740,7 @@ BEGIN
         WHERE TU.cip = getInfoForMatchmaking.cip
         AND tu.tutorat_id = getInfoForMatchmaking.idTuto1
         LIMIT 1);
-    RETURN QUERY SELECT p.id FROM Plage p
+    RETURN QUERY SELECT T2.id FROM Plage p
         INNER JOIN Tutorat T2 on p.id = T2.plage_id
         INNER JOIN APP A2 on A2.id = T2.APP_id
         INNER JOIN Session S2 on S2.code = A2.session_code
