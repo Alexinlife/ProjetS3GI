@@ -121,17 +121,6 @@ CREATE TABLE matchmaking
     FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id)
 );
 
-CREATE TABLE matchmaking
-(
-    id SERIAL,
-    cip_receveur VARCHAR(8),
-    tutorat_receveur INT,
-    tutorat_souhaite  INT,
-    FOREIGN KEY (cip_receveur) REFERENCES Utilisateur (cip),
-    FOREIGN KEY (tutorat_receveur) REFERENCES Tutorat (id),
-    FOREIGN KEY (tutorat_souhaite) REFERENCES Tutorat (id),
-    PRIMARY KEY (id)
-);
 
 CREATE INDEX ind_courriel_utilisateur ON Utilisateur(courriel);
 CREATE INDEX ind_nom_prenom_utilisateur ON Utilisateur(nom,prenom);
