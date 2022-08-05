@@ -763,10 +763,14 @@ RETURNS TABLE
 AS
 $$
     DECLARE appID INT;
+    DECLARE dateTuto DATE;
 BEGIN
     appID := (SELECT T.APP_id FROM Tutorat T
         WHERE T.id = getPlageFromTutorat.tutoID);
+    dateTuto := (SELECT date(T.date) FROM tutorat T
+        WHERE T.id = getplagefromtutorat.tutoID);
     RETURN QUERY SELECT T.plage_id, P.debut FROM Tutorat T
         INNER JOIN Plage P on P.id = T.plage_id
-        WHERE appID = T.APP_id;
+        WHERE appID = T.APP_id
+        AND dateTuto = date(T.date);
 END;$$ LANGUAGE 'plpgsql';
