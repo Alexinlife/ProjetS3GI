@@ -756,11 +756,13 @@ CREATE FUNCTION getPlageFromTutorat
 )
 RETURNS TABLE
 (
-    plageID INT
+    plageID INT,
+    plage TIMESTAMP
 )
 AS
 $$
 BEGIN
-RETURN QUERY SELECT T.plage_id FROM Tutorat T
+RETURN QUERY SELECT T.plage_id, P.debut FROM Tutorat T
+    INNER JOIN Plage P on P.id = T.plage_id
     WHERE T.id = getPlageFromTutorat.tutoID;
 END;$$ LANGUAGE 'plpgsql';
