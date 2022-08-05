@@ -12,7 +12,7 @@
            debutTutorat,
            sessionApp
         from gethoraireutilisateur(#{cip})
-        order by datetutorat
-        limit 3
+        where idTutorat = 1077 or idTutorat = 1025 or idTutorat = 20 or idTutorat = 83 or idTutorat = 8 or idTutorat = 89
+    order by datetutorat
     </select>
 </mapper>

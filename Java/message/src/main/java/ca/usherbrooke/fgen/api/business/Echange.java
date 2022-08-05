@@ -6,4 +6,7 @@ public class Echange {
     public int IdTutorat2;
     public String App;
     public String Session;
+
+
+    public String cip1;
 }

@@ -2,7 +2,6 @@ package ca.usherbrooke.fgen.api.service;
 
 import ca.usherbrooke.fgen.api.business.Echange;
 import ca.usherbrooke.fgen.api.persistence.EchangeMapper;
-import ca.usherbrooke.fgen.api.business.infoMatchmake;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
