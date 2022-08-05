@@ -749,3 +749,18 @@ BEGIN
         AND S2.code = session
         LIMIT 1;
 END;$$ LANGUAGE 'plpgsql';
+
+CREATE FUNCTION getPlageFromTutorat
+(
+    tutoID INT
+)
+RETURNS TABLE
+(
+    plageID INT
+)
+AS
+$$
+BEGIN
+RETURN QUERY SELECT T.plage_id FROM Tutorat T
+    WHERE T.id = getPlageFromTutorat.tutoID;
+END;$$ LANGUAGE 'plpgsql';
