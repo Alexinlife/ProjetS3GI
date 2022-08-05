@@ -758,11 +758,15 @@ RETURNS TABLE
 (
     plageID INT,
     plage TIMESTAMP
+    --appID_ int
 )
 AS
 $$
+    DECLARE appID INT;
 BEGIN
-RETURN QUERY SELECT T.plage_id, P.debut FROM Tutorat T
-    INNER JOIN Plage P on P.id = T.plage_id
-    WHERE T.id = getPlageFromTutorat.tutoID;
+    appID := (SELECT T.APP_id FROM Tutorat T
+        WHERE T.id = getPlageFromTutorat.tutoID);
+    RETURN QUERY SELECT T.plage_id, P.debut FROM Tutorat T
+        INNER JOIN Plage P on P.id = T.plage_id
+        WHERE appID = T.APP_id;
 END;$$ LANGUAGE 'plpgsql';
