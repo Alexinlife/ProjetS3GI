@@ -19,4 +19,5 @@ public interface EchangeMapper {
     Echange checkDispo(int idTutorat);
     Echange createMatch(String cip, int idTutorat, int idTutorat2);
     Echange echangeMatch(String cip1, String cip2, int idTutorat, int idTutorat2);
+    Echange getInfoForMatchmaking(String cip1, int idTutorat, int plageid);
 }

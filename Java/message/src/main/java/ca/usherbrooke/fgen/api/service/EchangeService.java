@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 
 @Path("/api")
@@ -51,25 +52,28 @@ public class EchangeService {
             @PathParam("plageidDemander") int plageDemander
     )
     {
-        Echange infoTuto = echangeMapper.checkMatchmaking(idtutorat1,idtutorat1);
         System.out.println("ALLO");
-        Echange valid = echangeMapper.checkMatchmaking(idtutorat1,infoTuto.IdTutorat2);
-        System.out.println(valid.cip);
-        if(valid != null)
+        Echange infoTuto = echangeMapper.getInfoForMatchmaking(cip,idtutorat1, plageDemander);
+        System.out.println(infoTuto.IdTutorat2);
+        String valid = echangeMapper.checkMatchmaking(idtutorat1,infoTuto.IdTutorat2).cip;
+        System.out.println("ALLO");
+        System.out.print("CIP : ");
+        System.out.println(valid);
+        if(!Objects.equals(valid, "alloallo"))
         {
-            System.out.println("ALLO");
-            echangeMapper.echangeMatch(cip, valid.cip, idtutorat1,infoTuto.IdTutorat2);
+            System.out.println("penis");
+            echangeMapper.echangeMatch(cip, valid, idtutorat1,infoTuto.IdTutorat2);
         }
         else {
-            valid = echangeMapper.checkDispo(infoTuto.IdTutorat2);
+            valid = echangeMapper.checkDispo(infoTuto.IdTutorat2).cip;
+            if(!Objects.equals(valid, "alloallo")){
+                echangeMapper.echangeMatch(cip, valid, idtutorat1,infoTuto.IdTutorat2);
+            }
+            else{
+                echangeMapper.createMatch(cip,idtutorat1,infoTuto.IdTutorat2);
+            }
+        }
 
-        }
-        if(valid != null){
-            echangeMapper.echangeMatch(cip, valid.cip, idtutorat1,infoTuto.IdTutorat2);
-        }
-        else{
-            echangeMapper.createMatch(cip,idtutorat1,infoTuto.IdTutorat2);
-        }
         return;
     }
 }

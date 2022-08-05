@@ -24,7 +24,7 @@
     </select>
     
     <select id="checkDispo" resultType="ca.usherbrooke.fgen.api.business.Echange">
-        SELECT cip1
+        SELECT cip
         FROM checkInDispo(#{arg0})
     </select>
 
@@ -34,5 +34,10 @@
 
     <select id="echangeMatch" resultType="ca.usherbrooke.fgen.api.business.Echange">
         SELECT makeEchangeWithTutorat(#{arg0},#{arg1},#{arg2},#{arg3})
+    </select>
+
+    <select id="getInfoForMatchmaking" resultType="ca.usherbrooke.fgen.api.business.Echange">
+        SELECT idtutorat2
+        FROM getinfoformatchmaking(#{arg0},#{arg1},#{arg2})
     </select>
 </mapper>

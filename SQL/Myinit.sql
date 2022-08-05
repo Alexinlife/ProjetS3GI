@@ -544,15 +544,15 @@ RETURNS TABLE
 AS $$
 BEGIN
     IF (exists(
-        SELECT M.cip_receveur FROM matchmaking M
-            WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        SELECT M.cip_demandeur FROM matchmaking M
+            WHERE M.tutorat_demandeur = checkInMatchMaking.plageIDReceveur
             AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur))
     THEN
-        RETURN QUERY SELECT M.cip_receveur FROM matchmaking M
-            WHERE M.tutorat_receveur = checkInMatchMaking.plageIDReceveur
+        RETURN QUERY SELECT M.cip_demandeur FROM matchmaking M
+            WHERE M.tutorat_demandeur = checkInMatchMaking.plageIDReceveur
             AND m.tutorat_souhaite = checkInMatchMaking.plageIDDemandeur;
     ELSE
-        RETURN QUERY VALUES ('0');
+        RETURN QUERY VALUES (CAST('alloallo' AS varchar(8)));
     END IF;
 END;$$ LANGUAGE 'plpgsql';
 
@@ -570,7 +570,7 @@ BEGIN
               WHERE D.idtutorat = checkInDispo.idTutorat)
         THEN RETURN QUERY SELECT D.cip FROM disponibilité_utilisateur D
                           WHERE D.idtutorat = checkInDispo.idTutorat;
-        ELSE RETURN QUERY VALUES ('0');
+        ELSE RETURN QUERY VALUES (CAST('alloallo' AS varchar(8)));
         END IF;
 END;$$ LANGUAGE 'plpgsql';
 
@@ -731,7 +731,7 @@ CREATE FUNCTION getInfoForMatchmaking
 )
 RETURNS TABLE
 (
-    idTuto2 INT
+    IdTutorat2 INT
 )
 AS
 $$
