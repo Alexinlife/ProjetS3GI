@@ -9,5 +9,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ListeTutoExcluMapper {
-    List<ListeTutoExclu> selectTuto(Date date, String app, String session);
+    List<ListeTutoExclu> selectTuto(int tutoID);
 }

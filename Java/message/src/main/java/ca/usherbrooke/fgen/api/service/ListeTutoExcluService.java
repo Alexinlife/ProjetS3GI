@@ -18,14 +18,12 @@ public class ListeTutoExcluService {
     ListeTutoExcluMapper excluMapper;
 
     @GET
-    @Path("get-exclu/{date}/{app}/{session}")
+    @Path("get-plage/{idTutorat}")
 
     public List<ListeTutoExclu> getListeExclu(
-            @PathParam("date") Date date,
-            @PathParam("app") String app,
-            @PathParam("session") String session
+            @PathParam("idTutorat") int tutoID
             ) {
-        List<ListeTutoExclu> exclu = excluMapper.selectTuto(date, app, session);
+        List<ListeTutoExclu> exclu = excluMapper.selectTuto(tutoID);
         return (exclu);
     }
 }

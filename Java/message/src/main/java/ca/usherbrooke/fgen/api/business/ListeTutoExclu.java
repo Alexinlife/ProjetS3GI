@@ -4,5 +4,5 @@ import java.sql.Timestamp;
 
 public class ListeTutoExclu {
     public Timestamp plage;
-    public int plageId;
+    public String plageID;
 }
