@@ -1,5 +1,4 @@
 import React from 'react';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/App.css';
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
@@ -41,7 +40,7 @@ export default class App extends React.Component {
           <NavBar />
         </header>
         <body className="App-body">
-          {/* this.state.sessionToken */ this.state.cip ?
+          { this.state.cip ?
             <Grid container rowSpacing={1} columnSpacing={{ sm: 6, md: 12 }}>
               <Grid className="App-left" item xs={12} sm={6}>
                 <Schedule />
@@ -71,17 +70,6 @@ export default class App extends React.Component {
                 </Box>
               </Grid>
             </Grid>}
-          <ToastContainer
-            position="bottom-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
         </body>
       </div>
     );
